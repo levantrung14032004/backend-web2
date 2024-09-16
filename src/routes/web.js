@@ -9,7 +9,8 @@ import {
   handleRemoveUser,
   handleGetAllProducts,
 } from "../handleControl/handController.js";
-
+import uploadIMG_control from "../controllers/uploadIMG.js";
+import upload from "../middleware/multer.js";
 import express from "express";
 const route = express.Router();
 
@@ -28,5 +29,5 @@ route.post("/create-new-user", handleCreateUser);
 route.post("/edit-user", handleUptadeUser);
 route.post("/remove", handleRemoveUser);
 route.get("/api/product", handleGetAllProducts);
-
+route.post("/uploadIMG", upload.array("file"), uploadIMG_control); 
 export default route;
