@@ -3,9 +3,9 @@ import database from "mysql2/promise";
 const connection = database.createPool({
   host: "localhost",
   user: "root",
-  port: 3306,
-  password: "0108",
-  database: "myweb",
+  port: process.env.DATABASE_PORT,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
