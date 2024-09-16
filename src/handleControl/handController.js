@@ -1,9 +1,5 @@
 import connection from "../database/database.js";
 import { getUsers } from "../database/getUsers.js";
-import getProducts from "../database/getProduct.js";
-
-import express from "express";
-const app = express();
 
 const handleHomepage = async (req, res) => {
   let allUser = await getUsers();
@@ -78,16 +74,6 @@ const handleRemoveUser = (req, res) => {
   res.redirect("/");
 };
 
-// Products
-const handleGetAllProducts = async (req, res) => {
-  let allProducts = await getProducts();
-  if (allProducts) {
-    res.status(200).json(allProducts);
-  } else {
-    res.status(404).json("error");
-  }
-};
-
 export {
   handleHomepage,
   handController,
@@ -97,5 +83,4 @@ export {
   handleUptadePage,
   handleRemovePage,
   handleRemoveUser,
-  handleGetAllProducts,
 };
