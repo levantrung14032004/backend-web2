@@ -7,8 +7,7 @@ import {
   handleUptadePage,
   handleRemovePage,
   handleRemoveUser,
-  handleGetAllProducts,
-} from "../handleControl/handController.js";
+} from "../controllers/user.js";
 import uploadIMG_control from "../controllers/uploadIMG.js";
 import upload from "../middleware/multer.js";
 import express from "express";
