@@ -1,9 +1,9 @@
-import getProducts from "../services/getProduct.js";
+import * as product from "../services/product.js";
 import connection from "../database/database.js";
 
 // Products
 const handleGetAllProducts = async (req, res) => {
-  let allProducts = await getProducts();
+  let allProducts = await product.getProduct();
   if (allProducts) {
     res.status(200).json(allProducts);
   } else {

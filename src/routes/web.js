@@ -8,6 +8,7 @@ import {
   handleRemovePage,
   handleRemoveUser,
 } from "../controllers/user.js";
+import * as product from "../controllers/product.js";
 import uploadIMG_control from "../controllers/uploadIMG.js";
 import upload from "../middleware/multer.js";
 import express from "express";
@@ -27,6 +28,6 @@ route.get("/remove/:id", handleRemovePage);
 route.post("/create-new-user", handleCreateUser);
 route.post("/edit-user", handleUptadeUser);
 route.post("/remove", handleRemoveUser);
-route.get("/api/product", handleGetAllProducts);
-route.post("/uploadIMG", upload.array("file"), uploadIMG_control); 
+route.get("/api/product", product.handleGetAllProducts);
+route.post("/uploadIMG", upload.array("product", 5), uploadIMG_control);
 export default route;

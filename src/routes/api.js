@@ -1,7 +1,7 @@
 import {
   handleGetAllProducts,
   handleSearchProducts,
-} from "../handleControl/handleControllerProduct.js";
+} from "../controllers/product.js";
 
 import express from "express";
 const routeAPI = express.Router();

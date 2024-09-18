@@ -2,12 +2,9 @@ import uploadIMG_service from "../services/uploadIMG.js";
 const uploadIMG_control = async (req, res) => {
   try {
     const files = req.files;
-    const uploadPromises = files.map(
-      async (file) => await uploadIMG_service(file)
-    );
-    res.status(200).json({
-      message: "files uploaded to firebase storage",
-    });
+    const uploadPromises = files.map((file) => uploadIMG_service(file));
+    const response = await Promise.all(uploadPromises);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json(result);
   }
