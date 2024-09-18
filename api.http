@@ -1,7 +1,0 @@
-post http://localhost:8080/add-thumbnail
-Content-Type: application/json
-
-{
-  "product_id": 180,
-  "url_image": "https://www.google.com"
-}
