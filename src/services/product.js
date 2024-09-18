@@ -11,7 +11,7 @@ export const addProduct = (
   author_id,
   title,
   price,
-  files,
+  url_img,
   description,
   quantity
 ) =>
@@ -19,7 +19,18 @@ export const addProduct = (
     try {
       const [result, fields] = await connection.query(
         "INSERT INTO product(category_id, author_id, title, price, thumbnail, description,created_at,update_at, status, quantity) VALUES (?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, 1, ?)",
-        [category_id, author_id, title, price, f]
+        [category_id, author_id, title, price, url_img, description, quantity]
       );
-    } catch {}
+      resolve({
+        error: result.affectedRows === 0 ? 1 : 0,
+        message: result.affectedRows === 0 ? "error" : "success",
+        id: result.insertId,
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
   });

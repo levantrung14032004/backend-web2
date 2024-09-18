@@ -1,6 +1,8 @@
 import uploadIMG_service from "../services/uploadIMG.js";
 const uploadIMG_control = async (req, res) => {
   try {
+    console.log(req);
+    console.log(req.body.author || null);
     const files = req.files;
     const uploadPromises = files.map((file) => uploadIMG_service(file));
     const response = await Promise.all(uploadPromises);

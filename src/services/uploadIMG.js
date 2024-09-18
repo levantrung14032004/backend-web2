@@ -27,15 +27,13 @@ const uploadIMG_service = (file) =>
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       resolve({
-        message: "file uploaded to firebase storage",
-        name: file.originalname,
-        type: file.mimetype,
+        error: 0,
         URL: downloadURL,
       });
     } catch (error) {
       reject({
-        message: "upload image fail",
-        error
+        error: 1,
+        message: error,
       });
     }
   });
