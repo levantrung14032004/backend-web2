@@ -12,12 +12,7 @@ const storage = getStorage();
 const uploadIMG_service = (file) =>
   new Promise(async (resolve, reject) => {
     try {
-    //   const dateTime = Date.now();
-
-      const storageRef = ref(
-        storage,
-        `files/${file.originalname}`
-      );
+      const storageRef = ref(storage, `files/${file.originalname}`);
 
       const metadata = {
         contentType: file.mimetype,
@@ -31,15 +26,15 @@ const uploadIMG_service = (file) =>
 
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      console.log("File successfully uploaded.");
       resolve({
-        message: "file uploaded to firebase storage",
-        name: file.originalname,
-        type: file.mimetype,
-        downloadURL: downloadURL,
+        error: 0,
+        URL: downloadURL,
       });
     } catch (error) {
-      reject(error);
+      reject({
+        error: 1,
+        message: error,
+      });
     }
   });
 export default uploadIMG_service;

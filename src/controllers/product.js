@@ -7,6 +7,10 @@ import {
   sortDateHightoLow,
 } from "../services/getProduct.js";
 
+import * as product from "../services/product.js";
+import * as gallery from "../services/gallery.js";
+import connection from "../database/database.js";
+import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 const handleGetAllProducts = async (req, res) => {
   let allProducts = await getProduct();
@@ -31,7 +35,6 @@ const handleSearchProducts = async (req, res) => {
     res.status(404).json(error.message);
   }
 };
-
 const handleDeleteProduct = async (req, res) => {
   try {
     let result = await deleteProduct(req.body.productId);
@@ -85,4 +88,50 @@ export {
   handleSortTitle,
   handleSortLowToHigh,
   handleSortHighToLow,
+};
+export const add_product = async (req, res) => {
+  try {
+    //upload file image
+    console.log(req.body, req.files);
+    const files = req.files;
+    const uploadPromises = files.map((file) => uploadIMG_service(file));
+    const url_images = await Promise.all(uploadPromises);
+    //add product
+    const category_id = req.body.category;
+    const author_id = req.body.author || null;
+    const title = req.body.name;
+    const price = req.body.price;
+    const url_img = url_images[0].URL;
+    const description = req.body.description;
+    const quantity = req.body.quantity;
+    if (
+      !category_id ||
+      !title ||
+      !price ||
+      !url_img ||
+      !description ||
+      !quantity
+    ) {
+      return res.status(400).json("Missing information");
+    }
+    const add_product_response = await product.addProduct(
+      category_id,
+      author_id,
+      title,
+      price,
+      url_img,
+      description,
+      quantity
+    );
+    //add thumbnail
+    console.log(add_product_response);
+    const add_thumbnail = url_images.map((url_image) =>
+      gallery.add_thumbnail(add_product_response.id, url_image.URL)
+    );
+    const add_thumbnail_response = await Promise.all(add_thumbnail);
+
+    res.status(200).json(add_product_response);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 };
