@@ -27,6 +27,5 @@ route.get("/remove/:id", handleRemovePage);
 route.post("/create-new-user", handleCreateUser);
 route.post("/edit-user", handleUptadeUser);
 route.post("/remove", handleRemoveUser);
-route.get("/api/product", handleGetAllProducts);
-route.post("/uploadIMG", upload.array("file"), uploadIMG_control); 
+route.post("/uploadIMG", upload.array("file"), uploadIMG_control);
 export default route;
