@@ -1,5 +1,5 @@
 import connection from "../database/database.js";
-import { getUsers } from "../services/getUsers.js";
+import { getUsers } from "../services/user.js";
 
 const handleHomepage = async (req, res) => {
   let allUser = await getUsers();
