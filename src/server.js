@@ -6,6 +6,7 @@ import routerAuth from "./routes/auth.js";
 import cors from "cors";
 import session from "express-session";
 import create_secret_key from "./utils/create_secret_key.js";
+import cookieParser from "cookie-parser";
 var app = express();
 var port = process.env.SERVER_PORT || 8080;
 
@@ -15,7 +16,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
     },
   })
@@ -30,10 +31,10 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use("/", router);
 app.use("/api", routerAPI);
 app.use("/auth", routerAuth);
-
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
