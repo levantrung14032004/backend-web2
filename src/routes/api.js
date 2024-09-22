@@ -14,6 +14,13 @@ import {
   handleAddOrder,
 } from "../controllers/user.js";
 
+import {
+  handleGetCompany,
+  handleInsertCompany,
+  handleDeleteCompany,
+  handleCreateReceived,
+} from "../controllers/company.js";
+
 import express from "express";
 const routeAPI = express.Router();
 
@@ -33,5 +40,13 @@ routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/add_order", handleAddOrder);
+
+// Goods
+routeAPI.post("/create-received", handleCreateReceived);
+
+// Company
+routeAPI.get("/company", handleGetCompany);
+routeAPI.post("/company", handleInsertCompany);
+routeAPI.put("/company", handleDeleteCompany);
 
 export default routeAPI;

@@ -5,11 +5,10 @@ import {
   sortProductWithTitle,
   sortDateLowToHigh,
   sortDateHightoLow,
-} from "../services/getProduct.js";
+} from "../services/product.js";
 
 import * as product from "../services/product.js";
 import * as gallery from "../services/gallery.js";
-import connection from "../database/database.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 const handleGetAllProducts = async (req, res) => {

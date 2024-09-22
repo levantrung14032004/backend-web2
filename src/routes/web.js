@@ -5,7 +5,6 @@ const route = express.Router();
 
 //
 
-route.post("/uploadIMG", upload.array("file"), uploadIMG_control);
 route.get("/api/product", product.handleGetAllProducts);
 route.post("/add-product", upload.array("product", 5), product.add_product);
 export default route;
