@@ -1,4 +1,5 @@
 import connection from "../database/database.js";
+import bcrypt from "bcrypt";
 
 const getUsers = async () => {
   const [result, fields] = await connection.query("SELECT * FROM user");
@@ -86,7 +87,6 @@ const getInfoById = async (id) => {
   }
 };
 
-const changePassword = async () => {};
 const editInfo = async (firstName, lastName, fullName, id) => {
   try {
     const [result, fields] = await connection.execute(
@@ -171,14 +171,7 @@ const addOrder = async (
   }
 };
 
-export {
-  getUsers,
-  getAllOrder,
-  getInfoById,
-  changePassword,
-  editInfo,
-  addOrder,
-};
+export { getUsers, getAllOrder, getInfoById, editInfo, addOrder };
 
 export const get_publicKey_accessToken = (id) =>
   new Promise(async (resolve, reject) => {
@@ -208,6 +201,40 @@ export const get_publicKey_refreshToken = (id) =>
       resolve({
         error: publicKey_RefreshToken ? 0 : 1,
         publicKey_RefreshToken: publicKey_RefreshToken || null,
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+export const changePassword = (id, password_current_input, new_password) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [user, fields] = await connection.execute(
+        "select password from user where id = ? ",
+        [id]
+      );
+      const password_current = user[0].password;
+      const checkPassword =
+        password_current &&
+        (await bcrypt.compare(password_current_input, password_current));
+      if (!checkPassword) {
+        resolve({
+          error: 1,
+          message: "Password wrong!",
+        });
+      }
+      const hash_new_password = bcrypt.hashSync(new_password, 10);
+      const result = await connection.execute(
+        "update user set password = ? where id = ?",
+        [hash_new_password, id]
+      );
+      resolve({
+        error: result[0].affectedRows === 1 ? 0 : 1,
+        message:
+          result[0].affectedRows === 1
+            ? "change password success"
+            : "change password fail",
       });
     } catch (error) {
       console.log(error);

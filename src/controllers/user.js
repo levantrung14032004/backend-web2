@@ -2,10 +2,10 @@ import {
   getUsers,
   getAllOrder,
   getInfoById,
-  changePassword,
   editInfo,
   addOrder,
 } from "../services/user.js";
+import * as userService from "../services/user.js";
 
 const handleGetAllOrder = async (req, res) => {
   try {
@@ -94,4 +94,35 @@ export {
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
+};
+export const changePassword = async (req, res) => {
+  try {
+    const new_password = req.body.new_password;
+    const current_password = req.body.current_password;
+
+    if (!new_password || !current_password)
+      return res.status(400).json({
+        error: 1,
+        message: "missing information",
+      });
+    let rgPw = /^(?=.*[A-Z])(?=(?:.*\d){8,}).*$/;
+    if (!rgPw.test(new_password)) {
+      return res.status(400).json({
+        error: 1,
+        message:
+          "Password must start with an uppercase letter and contain at least 8 digits.",
+      });
+    }
+    const user_id = req.data.id;
+    const response = await userService.changePassword(
+      user_id,
+      current_password,
+      new_password
+    );
+
+    return res.status(response.error === 0 ? 200 : 401).json(response);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
 };

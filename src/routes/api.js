@@ -14,8 +14,8 @@ import {
   handleAddOrder,
 } from "../controllers/user.js";
 import { authenticateToken } from "../middleware/JWT_action.js";
+import * as userController from "../controllers/user.js";
 import express from "express";
-import route from "./web.js";
 const routeAPI = express.Router();
 
 routeAPI.use(authenticateToken);
@@ -33,6 +33,7 @@ routeAPI.get("/product/filter/title", handleSortTitle);
 routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info", handleEditInfoById);
+routeAPI.post("/user/changePassword",userController.changePassword);
 routeAPI.post("/test", (req, res) => {
   return res.status(200).json({ message: "success" });
 });

@@ -18,7 +18,7 @@ export const login = (email, password) =>
           message: "Account is blocked",
         });
       }
-      const match = user && bcrypt.compare(password, user.password);
+      const match = user && await bcrypt.compare(password, user.password);
       resolve({
         error: match ? 0 : 1,
         id: match ? user.id : null,
