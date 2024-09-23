@@ -43,6 +43,19 @@ const createGoodsReceived = async (
         `insert into goodsReceivedDetails(idReceived,idProduct,price,quantity) value (?,?,?,?)`,
         [idBill[0].id, product.id, product.price, product.quantity]
       );
+
+      // Update value in stock
+      const [discount, fields] = await connection.execute(`select discount 
+        from company_delivery join goodsreceived 
+        on company_delivery.id = ${companyReceived}`);
+
+      let newPrice = Math.round(
+        product.price + (product.price * discount[0].discount) / 100
+      );
+
+      await connection.execute(`update product 
+                                set price = ${newPrice}
+                                where product.id = ${product.id}`);
     });
     return true;
   } catch (error) {

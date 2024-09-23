@@ -5,6 +5,30 @@ const getUsers = async () => {
   return result;
 };
 
+export const update_token_user = (
+  public_key_token,
+  public_key_refresh_token,
+  refresh_token,
+  id
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await connection.execute(
+        `UPDATE user SET publicKey_Token = ?, publicKey_RefreshToken = ?, RefreshToken = ? WHERE id = ?`,
+        [public_key_token, public_key_refresh_token, refresh_token, id]
+      );
+      resolve({
+        error: result.affectedRows === 0 ? 1 : 0,
+        message:
+          result.affectedRows === 0
+            ? " Update token failed"
+            : "Update token successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
 const getAllOrder = async (userId) => {
   try {
     const [result, fields] = await connection.execute(
@@ -155,3 +179,38 @@ export {
   editInfo,
   addOrder,
 };
+
+export const get_publicKey_accessToken = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await connection.execute(
+        `SELECT publicKey_Token FROM user WHERE id = ?`,
+        [id]
+      );
+      const publicKey_Token = result[0].publicKey_Token;
+      resolve({
+        error: publicKey_Token ? 0 : 1,
+        publicKey_Token: publicKey_Token || null,
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+export const get_publicKey_refreshToken = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await connection.execute(
+        `SELECT publicKey_RefreshToken FROM user WHERE id = ?`,
+        [id]
+      );
+      const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
+      resolve({
+        error: publicKey_RefreshToken ? 0 : 1,
+        publicKey_RefreshToken: publicKey_RefreshToken || null,
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });

@@ -35,7 +35,7 @@ export const addProduct = (
     }
   });
 
-const searchProductByName = async (value_search) => {
+export const searchProductByName = async (value_search) => {
   try {
     const [result, fields] = await connection.execute(
       `SELECT p.*, a.name AS author_name, c.name AS category_name,
@@ -55,7 +55,7 @@ const searchProductByName = async (value_search) => {
   }
 };
 
-const sortDateHightoLow = async () => {
+export const sortDateHightoLow = async () => {
   try {
     const [result, fields] = await connection.execute(
       `SELECT p.*, a.name AS author_name, c.name AS category_name,
@@ -73,7 +73,7 @@ const sortDateHightoLow = async () => {
   }
 };
 
-const sortDateLowToHigh = async () => {
+export const sortDateLowToHigh = async () => {
   try {
     const [result, fields] = await connection.execute(
       `SELECT p.*, a.name AS author_name, c.name AS category_name,
@@ -91,7 +91,7 @@ const sortDateLowToHigh = async () => {
   }
 };
 
-const deleteProduct = async (idProduct) => {
+export const deleteProduct = async (idProduct) => {
   try {
     let [result, fields] = await connection.execute(
       `Update product set status = 0 where id = ?`,
@@ -109,7 +109,7 @@ const deleteProduct = async (idProduct) => {
   }
 };
 
-const sortProductWithTitle = async () => {
+export const sortProductWithTitle = async () => {
   try {
     const [result, fields] =
       await connection.execute(`SELECT p.*, a.name AS author_name, c.name AS category_name, GROUP_CONCAT(g.thumbnail SEPARATOR ',') AS gallery_images
@@ -125,13 +125,4 @@ const sortProductWithTitle = async () => {
     console.log(error);
     return null;
   }
-};
-
-export {
-  getProduct,
-  searchProductByName,
-  sortDateLowToHigh,
-  sortDateHightoLow,
-  deleteProduct,
-  sortProductWithTitle,
 };

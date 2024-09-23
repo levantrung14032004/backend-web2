@@ -20,12 +20,13 @@ import {
   handleDeleteCompany,
   handleCreateReceived,
 } from "../controllers/company.js";
-
+import { authenticateToken } from "../middleware/JWT_action.js";
 import express from "express";
+import route from "./web.js";
 const routeAPI = express.Router();
 
+// routeAPI.use(authenticateToken);
 // Product
-
 routeAPI.get("/product", handleGetAllProducts);
 routeAPI.get("/search", handleSearchProducts);
 routeAPI.put("/product", handleDeleteProduct);

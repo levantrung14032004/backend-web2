@@ -1,18 +1,9 @@
-import {
-  getProduct,
-  searchProductByName,
-  deleteProduct,
-  sortProductWithTitle,
-  sortDateLowToHigh,
-  sortDateHightoLow,
-} from "../services/product.js";
-
 import * as product from "../services/product.js";
 import * as gallery from "../services/gallery.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 // Products
-const handleGetAllProducts = async (req, res) => {
-  let allProducts = await getProduct();
+export const handleGetAllProducts = async (req, res) => {
+  let allProducts = await product.getProduct();
   if (allProducts) {
     res.status(200).json(allProducts);
   } else {
@@ -20,11 +11,11 @@ const handleGetAllProducts = async (req, res) => {
   }
 };
 
-const handleSearchProducts = async (req, res) => {
+export const handleSearchProducts = async (req, res) => {
   try {
     let value_search = String(req.query.name).replaceAll("-", " ");
 
-    const result = await searchProductByName(value_search);
+    const result = await product.searchProductByName(value_search);
     if (result !== null) {
       res.status(200).json(result);
     } else {
@@ -34,9 +25,9 @@ const handleSearchProducts = async (req, res) => {
     res.status(404).json(error.message);
   }
 };
-const handleDeleteProduct = async (req, res) => {
+export const handleDeleteProduct = async (req, res) => {
   try {
-    let result = await deleteProduct(req.body.productId);
+    let result = await product.deleteProduct(req.body.productId);
     if (result) {
       res.status(200).json("Xóa sản phẩm thành công");
     } else {
@@ -47,9 +38,9 @@ const handleDeleteProduct = async (req, res) => {
   }
 };
 
-const handleSortTitle = async (req, res) => {
+export const handleSortTitle = async (req, res) => {
   try {
-    let result = await sortProductWithTitle();
+    let result = await product.sortProductWithTitle();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -58,9 +49,9 @@ const handleSortTitle = async (req, res) => {
   }
 };
 
-const handleSortLowToHigh = async (req, res) => {
+export const handleSortLowToHigh = async (req, res) => {
   try {
-    let result = await sortDateLowToHigh();
+    let result = await product.sortDateLowToHigh();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -69,9 +60,9 @@ const handleSortLowToHigh = async (req, res) => {
   }
 };
 
-const handleSortHighToLow = async (req, res) => {
+export const handleSortHighToLow = async (req, res) => {
   try {
-    let result = await sortDateHightoLow();
+    let result = await product.sortDateHightoLow();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -80,14 +71,6 @@ const handleSortHighToLow = async (req, res) => {
   }
 };
 
-export {
-  handleGetAllProducts,
-  handleSearchProducts,
-  handleDeleteProduct,
-  handleSortTitle,
-  handleSortLowToHigh,
-  handleSortHighToLow,
-};
 export const add_product = async (req, res) => {
   try {
     //upload file image
