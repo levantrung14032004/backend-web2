@@ -74,39 +74,29 @@ export const handleSortHighToLow = async (req, res) => {
 export const add_product = async (req, res) => {
   try {
     //upload file image
-    console.log(req.body, req.files);
     const files = req.files;
+    if (!files) {
+      return res.status(400).json("Missing image");
+    }
     const uploadPromises = files.map((file) => uploadIMG_service(file));
     const url_images = await Promise.all(uploadPromises);
     //add product
     const category_id = req.body.category;
     const author_id = req.body.author || null;
     const title = req.body.name;
-    const price = req.body.price;
     const url_img = url_images[0].URL;
     const description = req.body.description;
-    const quantity = req.body.quantity;
-    if (
-      !category_id ||
-      !title ||
-      !price ||
-      !url_img ||
-      !description ||
-      !quantity
-    ) {
+    if (!category_id || !title || !url_img || !description) {
       return res.status(400).json("Missing information");
     }
     const add_product_response = await product.addProduct(
       category_id,
       author_id,
       title,
-      price,
       url_img,
-      description,
-      quantity
+      description
     );
     //add thumbnail
-    console.log(add_product_response);
     const add_thumbnail = url_images.map((url_image) =>
       gallery.add_thumbnail(add_product_response.id, url_image.URL)
     );

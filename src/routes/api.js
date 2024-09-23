@@ -34,8 +34,6 @@ routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/changePassword",userController.changePassword);
-routeAPI.post("/test", (req, res) => {
-  return res.status(200).json({ message: "success" });
-});
+
 
 export default routeAPI;
