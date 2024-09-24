@@ -25,7 +25,7 @@ import * as userController from "../controllers/user.js";
 import express from "express";
 const routeAPI = express.Router();
 
-// routeAPI.use(authenticateToken);
+routeAPI.use(authenticateToken);
 // Product
 routeAPI.get("/product", handleGetAllProducts);
 routeAPI.get("/search", handleSearchProducts);

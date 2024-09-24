@@ -217,7 +217,7 @@ export const changePassword = (id, password_current_input, new_password) =>
       const password_current = user[0].password;
       const checkPassword =
         password_current &&
-        (await bcrypt.compare(password_current_input, password_current));
+        bcrypt.compareSync(password_current_input, password_current);
       if (!checkPassword) {
         resolve({
           error: 1,
