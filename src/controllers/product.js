@@ -107,3 +107,18 @@ export const add_product = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const handleGetProductWithCategory = async (req, res) => {
+  try {
+    const id_category = req.body.id_category;
+    const products = await product.getProductWithCategory(id_category);
+    if (products != null) {
+      res.status(200).json(products);
+    } else {
+      res.status(400).json("Some error occurred");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error.message);
+  }
+};

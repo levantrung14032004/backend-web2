@@ -30,6 +30,13 @@ app.use(
     credentials: true,
   })
 );
+app.use(
+  cors({
+    origin: process.env.BACKEND_URL,
+    methods: ["get", "post", "put", "delete"],
+    credentials: true,
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", router);
