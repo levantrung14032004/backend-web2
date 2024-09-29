@@ -71,7 +71,7 @@ export const register = async (req, res) => {
         message: "Email is invalid",
       });
     }
-    let rgPw = /^(?=.*[A-Z])(?=(?:.*\d){8,}).*$/;
+    let rgPw = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
     if (!rgPw.test(password)) {
       return res.status(400).json({
         error: 1,

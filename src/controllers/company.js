@@ -34,7 +34,6 @@ const handleInsertCompany = async function (req, res) {
 };
 
 const handleCreateReceived = async function (req, res) {
-  console.log(moment().format("YYYY-MM-DD hh:mm:ss"));
   try {
     let currentTime = moment().format("YYYY-MM-DD hh:mm:ss");
     let companyId = req.body.companyId;

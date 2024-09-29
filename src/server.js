@@ -23,25 +23,26 @@ app.use(
 );
 app.use("/static", express.static("public"));
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["get", "post", "put", "delete"],
-    credentials: true,
-  })
-);
-app.use(
-  cors({
-    origin: process.env.BACKEND_URL,
-    methods: ["get", "post", "put", "delete"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL,
+//     methods: ["get", "post", "put", "delete"],
+//     credentials: true,
+//   })
+// );
+// app.use(
+//   cors({
+//     origin: process.env.BACKEND_URL,
+//     methods: ["get", "post", "put", "delete"],
+//     credentials: true,
+//   })
+// );
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", router);
 app.use("/api", routerAPI);
-// app.use("/auth", routerAuth);
+app.use("/auth", routerAuth);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

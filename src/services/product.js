@@ -1,9 +1,12 @@
 import connection from "../database/database.js";
 
-const getProduct = async () => {
-  const [result, fields] = await connection.query("select * from product");
+export const getProduct = async () => {
+  const [category, another] = await connection.query(
+    `select * from product_category`
+  );
+  const [products, fields] = await connection.query("select * from product");
 
-  return result;
+  return { products, category };
 };
 
 export const addProduct = (

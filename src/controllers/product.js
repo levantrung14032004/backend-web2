@@ -3,9 +3,39 @@ import * as gallery from "../services/gallery.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 export const handleGetAllProducts = async (req, res) => {
-  let allProducts = await product.getProduct();
-  if (allProducts) {
-    res.status(200).json(allProducts);
+  let { products, category } = await product.getProduct();
+  const cateDetail = category.reduce((acc, cur) => {
+    const exist = acc.find((item) => item.id === cur.id_Product);
+    if (exist) {
+      exist.cate.push({ cate_id: cur.id_Category });
+    } else {
+      acc.push({
+        id: cur.id_Product,
+        cate: [{ cate_id: cur.id_Category }],
+      });
+    }
+    return acc;
+  }, []);
+
+  const result = products.reduce((acc, cur) => {
+    const exist = acc.find((item) => item.id === cur.id);
+    let catevalue;
+    if (exist) {
+      catevalue = cateDetail.find((item) => item.id === exist.id_Product);
+      console.log(catevalue);
+      exist.category_id = catevalue.cate;
+    } else {
+      catevalue = cateDetail.find((item) => item.id === cur.id);
+      console.log(catevalue);
+      acc.push({
+        ...cur,
+        category_id: catevalue ? catevalue.cate : [],
+      });
+    }
+    return acc;
+  }, []);
+  if (result.length > 0) {
+    res.status(200).json(result);
   } else {
     res.status(404).json("error");
   }
@@ -110,7 +140,7 @@ export const add_product = async (req, res) => {
 
 export const handleGetProductWithCategory = async (req, res) => {
   try {
-    const id_category = req.body.id_category;
+    const id_category = req.query.category_id;
     const products = await product.getProductWithCategory(id_category);
     if (products != null) {
       res.status(200).json(products);
