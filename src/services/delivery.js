@@ -30,9 +30,13 @@ const createGoodsReceived = async (
   products
 ) => {
   try {
+    const total = Math.ceil(
+      products.reduce((acc, cur) => (acc += cur.price * cur.quantity), 0)
+    );
+
     await connection.execute(
-      `insert into goodsReceived(dateReceived,companyReceived,noteReceived) value (?,?,?)`,
-      [dateReceived, companyReceived, noteReceived]
+      `insert into goodsReceived(dateReceived,companyReceived,noteReceived,total_value) value (?,?,?,?)`,
+      [dateReceived, companyReceived, noteReceived, total]
     );
     let [idBill, another] = await connection.query(
       `SELECT id FROM goodsReceived ORDER BY id DESC LIMIT 1;`
@@ -57,6 +61,7 @@ const createGoodsReceived = async (
                                 set price = ${newPrice}
                                 where product.id = ${product.id}`);
     });
+
     return true;
   } catch (error) {
     console.error(error);
@@ -64,4 +69,26 @@ const createGoodsReceived = async (
   }
 };
 
-export { getCompany, insertCompany, deleteCompany, createGoodsReceived };
+const getGoodsReceived = async function () {
+  try {
+    const [values, fields] = await connection.execute(
+      `select * from goodsreceived`
+    );
+    if (values) {
+      return values;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export {
+  getCompany,
+  insertCompany,
+  deleteCompany,
+  createGoodsReceived,
+  getGoodsReceived,
+};

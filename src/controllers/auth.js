@@ -61,14 +61,14 @@ export const register = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         error: 1,
-        message: "Missing email or password",
+        message: "Không được bỏ trống email hoặc mật khẩu",
       });
     }
     let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!rgEmail.test(email)) {
       return res.status(400).json({
         error: 1,
-        message: "Email is invalid",
+        message: "Email không hợp lệ",
       });
     }
     let rgPw = /^(?=.*[A-Z]).{8,}$/;
@@ -76,7 +76,7 @@ export const register = async (req, res) => {
       return res.status(400).json({
         error: 1,
         message:
-          "Password must contain an uppercase letter and at least 8 digits.",
+          "Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất 1 ký tự viết hoa",
       });
     }
     const result = await authService.register(email, password);
