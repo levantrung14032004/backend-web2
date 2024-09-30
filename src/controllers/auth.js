@@ -71,12 +71,12 @@ export const register = async (req, res) => {
         message: "Email is invalid",
       });
     }
-    let rgPw = /^(?=.*[A-Z])(?=(?:.*\d){8,}).*$/;
+    let rgPw = /^(?=.*[A-Z]).{8,}$/;
     if (!rgPw.test(password)) {
       return res.status(400).json({
         error: 1,
         message:
-          "Password must start with an uppercase letter and contain at least 8 digits.",
+          "Password must contain an uppercase letter and at least 8 digits.",
       });
     }
     const result = await authService.register(email, password);
@@ -158,4 +158,9 @@ export const refresh_token = async (req, res) => {
   } catch (err) {
     return res.status(500).json(err);
   }
+};
+export const check_status = async (req, res) => {
+  return res.status(200).json({
+    error: req.session.user_id ? 0 : 1,
+  });
 };

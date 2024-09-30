@@ -1,10 +1,27 @@
 import connection from "../database/database.js";
 
-const getProduct = async () => {
-  const [result, fields] = await connection.query("select * from product");
-
-  return result;
-};
+export const getProduct = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const new_products = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 order by update_at DESC"
+      );
+      const price = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 order by price"
+      );
+      const price_desc = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 order by price DESC"
+      );
+      resolve({
+        new_products: new_products[0],
+        price: price[0],
+        price_desc: price_desc[0],
+      });
+    } catch (error) {
+      console.log(error);
+      reject(null);
+    }
+  });
 
 export const addProduct = (
   category_id,
@@ -149,3 +166,27 @@ export const getProductWithCategory = async (id) => {
     return null;
   }
 };
+export const get_products_at_home = (category_id1, category_id2) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const new_products = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 order by update_at DESC limit 8"
+      );
+      const by_category1 = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 and category_id = ? order by update_at DESC limit 8",
+        [category_id1]
+      );
+      const by_category2 = await connection.query(
+        "SELECT id,title,price,thumbnail FROM product where status = 1 and category_id = ? order by update_at DESC limit 8",
+        [category_id2]
+      );
+      resolve({
+        new_products: new_products[0],
+        by_category1: by_category1[0],
+        by_category2: by_category2[0],
+      });
+    } catch (error) {
+      console.log(error);
+      reject(null);
+    }
+  });

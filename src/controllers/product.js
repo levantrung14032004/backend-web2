@@ -3,11 +3,11 @@ import * as gallery from "../services/gallery.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 export const handleGetAllProducts = async (req, res) => {
-  let allProducts = await product.getProduct();
-  if (allProducts) {
-    res.status(200).json(allProducts);
-  } else {
-    res.status(404).json("error");
+  try {
+    let allProducts = await product.getProduct();
+    return res.status(200).json(allProducts);
+  } catch (error) {
+    return res.status(500).json(error.message);
   }
 };
 
@@ -120,5 +120,19 @@ export const handleGetProductWithCategory = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).error(error.message);
+  }
+};
+export const get_products_at_home = async (req, res) => {
+  try {
+    const category_id1 = req.query.category_id1;
+    const category_id2 = req.query.category_id2;
+    const result = await product.get_products_at_home(
+      category_id1,
+      category_id2
+    );
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
   }
 };

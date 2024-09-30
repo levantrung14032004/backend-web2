@@ -15,7 +15,7 @@ export const login = (email, password) =>
       if (user && user.status === 0) {
         resolve({
           error: 1,
-          message: "Account is blocked",
+          message: "Tài khoản đã bị khóa",
         });
       }
       const match = user && bcrypt.compareSync(password, user.password);
@@ -24,8 +24,8 @@ export const login = (email, password) =>
         id: match ? user.id : null,
         role_id: match ? user.role_id : null,
         message: match
-          ? "Login successfully"
-          : "Email or password is incorrect",
+          ? "Đăng nhập thành công"
+          : "Email hoặc mật khẩu không đúng",
       });
     } catch (err) {
       console.log(err);
