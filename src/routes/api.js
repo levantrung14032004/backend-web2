@@ -31,6 +31,8 @@ import { authenticateToken } from "../middleware/JWT_action.js";
 import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
+import * as category from "../controllers/category.js";
+import route from "./web.js";
 const routeAPI = express.Router();
 
 // Permission
@@ -40,9 +42,14 @@ routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", handleGetAllProducts);
 routeAPI.get("/search", handleSearchProducts);
-routeAPI.put("/product", handleDeleteProduct);
-routeAPI.get("/product_mainpage", products.get_products_at_home);
+routeAPI.put("/product", handleDeleteProduct); // route này phải để ở admin phải có xác thực mới được xóa sửa lại đi nha
+routeAPI.get("/product/mainpage", products.get_products_at_home);
+routeAPI.get("/product/detail", products.get_product_by_id);
+routeAPI.get("/product/limit",products.getProductlimit);
+routeAPI.get("/product/category", products.getProductByCategory);
 
+//Category
+routeAPI.get("/category", category.getCategoryById);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
@@ -69,6 +76,5 @@ routeAPI.put("/company", handleDeleteCompany);
 // Authors
 
 routeAPI.get("/author", handleGetAuthors);
-routeAPI.use(authenticateToken);
 
 export default routeAPI;

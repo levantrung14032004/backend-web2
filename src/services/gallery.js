@@ -17,3 +17,21 @@ export const add_thumbnail = (product_id, url_image) =>
       });
     }
   });
+export const get_gallery = (product_id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await connection.query(
+        "SELECT thumbnail FROM gallery WHERE product_id = ?",
+        [product_id]
+      );
+      resolve({
+        error: result.length === 0 ? 1 : 0,
+        gallery: result,
+      });
+    } catch (error) {
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
+  });

@@ -1,5 +1,5 @@
-import { getDetailCategory } from "../services/category";
-
+import { getDetailCategory } from "../services/category.js";
+import * as categoryService from "../services/category.js";
 const handleGetDetailCategory = async (req, res) => {
   try {
     const values = await getDetailCategory();
@@ -27,3 +27,17 @@ const handleGetDetailCategory = async (req, res) => {
 };
 
 export { handleGetDetailCategory };
+
+export const getCategoryById = async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (!id) {
+      return res.status(400).json("Missing required parameter: id");
+    }
+    const result = await categoryService.getCategoryById(id);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};

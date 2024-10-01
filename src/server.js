@@ -9,7 +9,13 @@ import create_secret_key from "./utils/create_secret_key.js";
 import cookieParser from "cookie-parser";
 var app = express();
 var port = process.env.SERVER_PORT || 8080;
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    methods: ["get", "post", "put", "delete"],
+    credentials: true,
+  })
+);
 app.use(
   session({
     secret: create_secret_key(),
@@ -23,24 +29,9 @@ app.use(
 );
 app.use("/static", express.static("public"));
 app.use(express.json());
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_URL,
-//     methods: ["get", "post", "put", "delete"],
-//     credentials: true,
-//   })
-// );
-// app.use(
-//   cors({
-//     origin: process.env.BACKEND_URL,
-//     methods: ["get", "post", "put", "delete"],
-//     credentials: true,
-//   })
-// );
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use("/", router);
+// app.use("/", router);
 app.use("/api", routerAPI);
 app.use("/auth", routerAuth);
 

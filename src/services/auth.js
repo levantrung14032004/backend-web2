@@ -7,7 +7,7 @@ const hashPassword = (password) => {
 export const login = (email, password) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [rows, fields] = await database.query(
+      const [rows, fields] = await database.execute(
         "SELECT id, role_id, password, status FROM user WHERE email = ?",
         [email]
       );
@@ -35,7 +35,7 @@ export const login = (email, password) =>
 export const register = (email, password) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [result, fields] = await database.query(
+      const [result, fields] = await database.execute(
         "INSERT into user (role_id,email,password,status) SELECT 1, ?, ?, 1 WHERE not EXISTS( SELECT * FROM user WHERE email = ? )",
         [email, hashPassword(password), email]
       );
