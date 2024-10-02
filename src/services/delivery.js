@@ -69,26 +69,4 @@ const createGoodsReceived = async (
   }
 };
 
-const getGoodsReceived = async function () {
-  try {
-    const [values, fields] = await connection.execute(
-      `select * from goodsreceived`
-    );
-    if (values) {
-      return values;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
-
-export {
-  getCompany,
-  insertCompany,
-  deleteCompany,
-  createGoodsReceived,
-  getGoodsReceived,
-};
+export { getCompany, insertCompany, deleteCompany, createGoodsReceived };

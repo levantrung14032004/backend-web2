@@ -7,6 +7,20 @@ import {
 } from "../services/user.js";
 import * as userService from "../services/user.js";
 
+const handleGetAllUsers = async (req, res) => {
+  try {
+    const result = await getUsers();
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(401).json("Co loi getuser");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(501).json(error.message);
+  }
+};
+
 const handleGetAllOrder = async (req, res) => {
   try {
     let user_id = req.body.user_id;
@@ -94,6 +108,7 @@ export {
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
+  handleGetAllUsers,
 };
 export const changePassword = async (req, res) => {
   try {
