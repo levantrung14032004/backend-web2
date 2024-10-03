@@ -49,7 +49,7 @@ routeAPI.get("/product/limit",products.getProductlimit);
 routeAPI.get("/product/category", products.getProductByCategory);
 
 //Category
-routeAPI.get("/category", category.getCategoryById);
+routeAPI.get("/category", category.getAllCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);

@@ -9,7 +9,7 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         error: 1,
-        message: "Missing email or password",
+        message: "Không được bỏ trống email hoặc mật khẩu",
       });
     }
     const result = await authService.login(email, password);
@@ -163,4 +163,25 @@ export const check_status = async (req, res) => {
   return res.status(200).json({
     error: req.session.user_id ? 0 : 1,
   });
+};
+export const logout = async (req, res) => {
+  try {
+    const id = req.session.user_id;
+    if (!id) {
+      return res.status(400).json({
+        error: 1,
+        message: "Missing user id",
+      });
+    }
+    const result = await authService.logout(id);
+    if (result.error === 1) return res.status(200).json(result);
+    req.session.destroy();
+    return res
+      .clearCookie("access_token")
+      .clearCookie("refresh_token")
+      .status(200)
+      .json(result);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };

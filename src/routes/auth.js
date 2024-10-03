@@ -6,4 +6,5 @@ auth_route.post("/login", auth.login);
 auth_route.post("/register", auth.register);
 auth_route.post("/refreshToken", auth.refresh_token);
 auth_route.post("/checkLogin", auth.check_status);
+auth_route.post("/logout", auth.logout);
 export default auth_route;
