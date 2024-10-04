@@ -50,4 +50,19 @@ export const register = (email, password) =>
       console.log(err);
       reject(err);
     }
-  });
+  })
+export const logout = (id) => new Promise(async (resolve, reject) => {
+  try {
+    const [result, fields] = await database.execute(
+      "UPDATE user SET publicKey_Token = NULL, publicKey_RefreshToken = NULL, RefreshToken = NULL WHERE id = ?",
+      [id]
+    );  
+    resolve({
+      error: result.affectedRows === 1 ? 0 : 1,
+      message: result.affectedRows === 1 ? "Logout successfully" : "Logout failed",
+    });
+  } catch (error) {
+    console.log(error);
+    reject(error);
+  }
+})
