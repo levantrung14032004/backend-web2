@@ -1,51 +1,57 @@
-import * as product from "../services/product.js";
+import * as productService from "../services/product.js";
 import * as gallery from "../services/gallery.js";
+import * as category from "../services/category.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 export const handleGetAllProducts = async (req, res) => {
-  let { products, category } = await product.getProduct();
-  const cateDetail = category.reduce((acc, cur) => {
-    const exist = acc.find((item) => item.id === cur.id_Product);
-    if (exist) {
-      exist.cate.push({ cate_id: cur.id_Category });
-    } else {
-      acc.push({
-        id: cur.id_Product,
-        cate: [{ cate_id: cur.id_Category }],
-      });
-    }
-    return acc;
-  }, []);
-
-  const result = products.reduce((acc, cur) => {
-    const exist = acc.find((item) => item.id === cur.id);
-    let catevalue;
-    if (exist) {
-      catevalue = cateDetail.find((item) => item.id === exist.id_Product);
-      console.log(catevalue);
-      exist.category_id = catevalue.cate;
-    } else {
-      catevalue = cateDetail.find((item) => item.id === cur.id);
-      console.log(catevalue);
-      acc.push({
-        ...cur,
-        category_id: catevalue ? catevalue.cate : [],
-      });
-    }
-    return acc;
-  }, []);
-  if (result.length > 0) {
-    res.status(200).json(result);
-  } else {
-    res.status(404).json("error");
+  try {
+    let allProducts = await productService.getProduct();
+    return res.status(200).json(allProducts);
+  } catch (error) {
+    return res.status(500).json(error.message);
   }
+  // let { products, category } = await product.getProduct();
+  // const cateDetail = category.reduce((acc, cur) => {
+  //   const exist = acc.find((item) => item.id === cur.id_Product);
+  //   if (exist) {
+  //     exist.cate.push({ cate_id: cur.id_Category });
+  //   } else {
+  //     acc.push({
+  //       id: cur.id_Product,
+  //       cate: [{ cate_id: cur.id_Category }],
+  //     });
+  //   }
+  //   return acc;
+  // }, []);
+  // const result = products.reduce((acc, cur) => {
+  //   const exist = acc.find((item) => item.id === cur.id);
+  //   let catevalue;
+  //   if (exist) {
+  //     catevalue = cateDetail.find((item) => item.id === exist.id_Product);
+  //     console.log(catevalue);
+  //     exist.category_id = catevalue.cate;
+  //   } else {
+  //     catevalue = cateDetail.find((item) => item.id === cur.id);
+  //     console.log(catevalue);
+  //     acc.push({
+  //       ...cur,
+  //       category_id: catevalue ? catevalue.cate : [],
+  //     });
+  //   }
+  //   return acc;
+  // }, []);
+  // if (result.length > 0) {
+  //   res.status(200).json(result);
+  // } else {
+  //   res.status(404).json("error");
+  // }
 };
 
 export const handleSearchProducts = async (req, res) => {
   try {
     let value_search = String(req.query.name).replaceAll("-", " ");
 
-    const result = await product.searchProductByName(value_search);
+    const result = await productService.searchProductByName(value_search);
     if (result !== null) {
       res.status(200).json(result);
     } else {
@@ -57,7 +63,7 @@ export const handleSearchProducts = async (req, res) => {
 };
 export const handleDeleteProduct = async (req, res) => {
   try {
-    let result = await product.deleteProduct(req.body.productId);
+    let result = await productService.deleteProduct(req.body.productId);
     if (result) {
       res.status(200).json("Xóa sản phẩm thành công");
     } else {
@@ -70,7 +76,7 @@ export const handleDeleteProduct = async (req, res) => {
 
 export const handleSortTitle = async (req, res) => {
   try {
-    let result = await product.sortProductWithTitle();
+    let result = await productService.sortProductWithTitle();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -81,7 +87,7 @@ export const handleSortTitle = async (req, res) => {
 
 export const handleSortLowToHigh = async (req, res) => {
   try {
-    let result = await product.sortDateLowToHigh();
+    let result = await productService.sortDateLowToHigh();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -92,7 +98,7 @@ export const handleSortLowToHigh = async (req, res) => {
 
 export const handleSortHighToLow = async (req, res) => {
   try {
-    let result = await product.sortDateHightoLow();
+    let result = await productService.sortDateHightoLow();
     result != null
       ? res.status(200).json(result)
       : res.status(500).json("have error");
@@ -119,7 +125,7 @@ export const add_product = async (req, res) => {
     if (!category_id || !title || !url_img || !description) {
       return res.status(400).json("Missing information");
     }
-    const add_product_response = await product.addProduct(
+    const add_product_response = await productService.addProduct(
       category_id,
       author_id,
       title,
@@ -152,3 +158,67 @@ export const handleGetProductWithCategory = async (req, res) => {
     res.status(500).error(error.message);
   }
 };
+export const get_products_at_home = async (req, res) => {
+  try {
+    const category_id1 = req.query.category_id1;
+    const category_id2 = req.query.category_id2;
+    const result = await productService.get_products_at_home(
+      category_id1,
+      category_id2
+    );
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+export const get_product_by_id = async (req, res) => {
+  try {
+    const id_product = req.query.id_product;
+    if (!id_product) {
+      return res.status(400).json("Missing id product");
+    }
+    const res_product = await productService.getProductById(id_product);
+    if (res_product.error != 0) {
+      return res.status(500).json(res_product);
+    }
+    const res_category = await category.getCategorybyProduct(id_product);
+    const res_gallery = await gallery.get_gallery(id_product);
+    return res.status(200).json({
+      error: 0,
+      product: {
+        ...res_product.product,
+        category: res_category.category,
+        gallery: res_gallery.gallery,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+export const getProductlimit = async (req, res) => {
+  try {
+    const limit = req.query.limit;
+    if(!limit){
+      return res.status(400).json("Missing limit");
+    }
+    const result = await productService.getProductlimit(limit);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+export const getProductByCategory = async (req, res) => {
+  try{
+    const id = req.query.id;
+    if(!id){
+      return res.status(400).json("Missing id category");
+    }
+    const result = await productService.getProductByCategory(id);
+    return res.status(200).json(result);
+  }
+  catch(error){
+    return res.status(500).json(error);
+  }
+}

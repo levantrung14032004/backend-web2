@@ -7,7 +7,7 @@ const hashPassword = (password) => {
 export const login = (email, password) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [rows, fields] = await database.query(
+      const [rows, fields] = await database.execute(
         "SELECT id, role_id, password, status FROM user WHERE email = ?",
         [email]
       );
@@ -15,17 +15,17 @@ export const login = (email, password) =>
       if (user && user.status === 0) {
         resolve({
           error: 1,
-          message: "Account is blocked",
+          message: "Tài khoản đã bị khóa",
         });
       }
-      const match = user && await bcrypt.compare(password, user.password);
+      const match = user && bcrypt.compareSync(password, user.password);
       resolve({
         error: match ? 0 : 1,
         id: match ? user.id : null,
         role_id: match ? user.role_id : null,
         message: match
-          ? "Login successfully"
-          : "Email or password is incorrect",
+          ? "Đăng nhập thành công"
+          : "Email hoặc mật khẩu không đúng",
       });
     } catch (err) {
       console.log(err);
@@ -35,7 +35,7 @@ export const login = (email, password) =>
 export const register = (email, password) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [result, fields] = await database.query(
+      const [result, fields] = await database.execute(
         "INSERT into user (role_id,email,password,status) SELECT 1, ?, ?, 1 WHERE not EXISTS( SELECT * FROM user WHERE email = ? )",
         [email, hashPassword(password), email]
       );

@@ -25,21 +25,28 @@ import {
   handleCreateReceived,
 } from "../controllers/company.js";
 
+import { handleGetEmployee } from "../controllers/employee.js";
+
 import { handleGetGoodsReceived } from "../controllers/received.js";
 
-import { handleGetPermissions } from "../controllers/permission.js";
+import {
+  handleGetPermissions,
+  handleGetRole,
+} from "../controllers/permission.js";
 
 import { handleGetAuthors } from "../controllers/author.js";
-import { authenticateToken } from "../middleware/JWT_action.js";
 import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
-import route from "./web.js";
 const routeAPI = express.Router();
+
+// Employee
+routeAPI.get("/employee", handleGetEmployee);
 
 // Permission
 routeAPI.get("/permissions", handleGetPermissions);
+routeAPI.get("/role", handleGetRole);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
@@ -64,7 +71,6 @@ routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 // Temporary Product
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 
-routeAPI.use(authenticateToken);
 // User
 routeAPI.get("/user", handleGetAllUsers);
 routeAPI.post("/user/orders", handleGetAllOrder);
