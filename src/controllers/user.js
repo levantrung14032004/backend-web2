@@ -38,7 +38,9 @@ const handleGetAllOrder = async (req, res) => {
 
 const handleGetInfoById = async (req, res) => {
   try {
-    let user_id = req.body.user_id;
+    let user_id = req.data.id;
+    if (!user_id)
+      return res.status(400).json({ error: 1, message: "Missing user_id" });
     const result = await getInfoById(user_id);
     if (result != null) {
       return res.status(200).json(result);

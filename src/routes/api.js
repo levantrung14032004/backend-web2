@@ -36,6 +36,7 @@ import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
 import route from "./web.js";
+import * as order from "../controllers/order.js";
 const routeAPI = express.Router();
 
 // Permission
@@ -69,8 +70,10 @@ routeAPI.use(authenticateToken);
 routeAPI.get("/user", handleGetAllUsers);
 routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
-routeAPI.put("/user/info", handleEditInfoById);
+// routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/changePassword", userController.changePassword);
+routeAPI.get("/user/order", order.getOrderByUser);
+
 
 routeAPI.post("/user/add_order", handleAddOrder);
 
@@ -88,5 +91,7 @@ routeAPI.get("/author", handleGetAuthors);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);
+
+//order
 
 export default routeAPI;

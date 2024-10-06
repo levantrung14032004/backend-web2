@@ -185,3 +185,44 @@ export const logout = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+export const send_Code_Register = async (req, res) => {
+  try {
+    const email = req.body.email;
+    if (!email) {
+      return res.status(400).json({
+        error: 1,
+        message: "Không được bỏ trống email",
+      });
+    }
+    let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!rgEmail.test(email)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Email không hợp lệ",
+      });
+    }
+    const result = await authService.send_Code_Register(email);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+export const verify_Code_Register = async (req, res) => {
+  const email = req.body.email;
+  const code = req.body.code;
+  if (!email || !code) {
+    return res.status(400).json({
+      error: 1,
+      message: "Không được bỏ trống email hoặc mã xác nhận",
+    });
+  }
+  let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!rgEmail.test(email)) {
+    return res.status(400).json({
+      error: 1,
+      message: "Email không hợp lệ",
+    });
+  }
+  const result = authService.verify_Code_Register(email, code);
+  return res.status(result.error === 0 ? 200 : 401).json(result);
+};

@@ -1,5 +1,7 @@
 import database from "../database/database.js";
 import bcrypt from "bcrypt";
+import { sendCode } from "../utils/sendmail.js";
+let verificationCodes= {};
 const saltRounds = 10;
 const hashPassword = (password) => {
   return bcrypt.hashSync(password, saltRounds);
@@ -43,26 +45,71 @@ export const register = (email, password) =>
         error: result.affectedRows === 0 ? 1 : 0,
         message:
           result.affectedRows === 0
-            ? "Email is already taken"
-            : "Register successfully",
+            ? "Email đã tồn tại"
+            : "Đăng ký thành công",
       });
     } catch (err) {
       console.log(err);
       reject(err);
     }
-  })
-export const logout = (id) => new Promise(async (resolve, reject) => {
-  try {
-    const [result, fields] = await database.execute(
-      "UPDATE user SET publicKey_Token = NULL, publicKey_RefreshToken = NULL, RefreshToken = NULL WHERE id = ?",
-      [id]
-    );  
-    resolve({
-      error: result.affectedRows === 1 ? 0 : 1,
-      message: result.affectedRows === 1 ? "Logout successfully" : "Logout failed",
-    });
-  } catch (error) {
-    console.log(error);
-    reject(error);
+  });
+export const logout = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await database.execute(
+        "UPDATE user SET publicKey_Token = NULL, publicKey_RefreshToken = NULL, RefreshToken = NULL WHERE id = ?",
+        [id]
+      );
+      resolve({
+        error: result.affectedRows === 1 ? 0 : 1,
+        message:
+          result.affectedRows === 1 ? "Logout successfully" : "Logout failed",
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+export const send_Code_Register = (email) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await database.query(
+        "SELECT * FROM user WHERE email = ?",
+        [email]
+      );
+      if (rows.length > 0) {
+        resolve({
+          error: 1,
+          message: "Email đã tồn tại",
+        });
+      }
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const result = await sendCode(email, code);
+      if (result != null) {
+        verificationCodes[email] = code;
+      }
+      resolve({
+        error: result != null ? 0 : 1,
+        message:
+          result != null
+            ? "Code đã được gửi đến email của bạn"
+            : "Gửi code thất bại",
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+  export const verify_Code_Register = (email, code) => {
+    if (verificationCodes[email] === code) {
+      delete verificationCodes[email];
+      return {
+        error: 0,
+        message: "Code xác nhận đúng",
+      };
+    }
+    return {
+      error: 1,
+      message: "Code xác nhận không đúng",
+    };
   }
-})

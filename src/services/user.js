@@ -80,7 +80,7 @@ const getInfoById = async (id) => {
     if (!result) {
       return null;
     }
-    return result;
+    return result[0];
   } catch (error) {
     console.log(error);
     return null;
