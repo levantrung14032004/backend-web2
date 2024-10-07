@@ -68,7 +68,7 @@ const handleEditInfoById = async (req, res) => {
 
 const handleAddOrder = async (req, res) => {
   try {
-    let user_id = req.body.userId;
+    let user_id = req.data.id;
     let fullname = req.body.fullname;
     let phoneNumber = req.body.phoneNumber;
     let address = req.body.address;

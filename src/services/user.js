@@ -1,6 +1,7 @@
 import connection from "../database/database.js";
 import bcrypt from "bcrypt";
-
+import dot from "dotenv";
+dot.config();
 const getUsers = async () => {
   const [result, fields] = await connection.query("SELECT * FROM user");
   return result;
@@ -34,9 +35,9 @@ const getAllOrder = async (userId) => {
   try {
     const [result, fields] = await connection.execute(
       `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status
-          from myweb.order o
-          join myweb.order_detail od on o.id = od.order_id
-          join myweb.product p on p.id = od.product_id
+          from ${process.env.DATABASE_NAME}.order o
+          join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
+          join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
           where o.user_id = ?;`,
       [userId]
     );
@@ -115,7 +116,7 @@ const addOrder = async (
 ) => {
   try {
     await connection.execute(
-      `INSERT INTO myweb.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),2)`,
+      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),2)`,
       [
         user_id,
         employeeId,
@@ -129,7 +130,7 @@ const addOrder = async (
       ]
     );
     const [lastId, another] = await connection.query(
-      `SELECT id FROM myweb.order ORDER BY id DESC LIMIT 1;`
+      `SELECT id FROM ${process.env.DATABASE_NAME}.order ORDER BY id DESC LIMIT 1;`
     );
 
     const productsInOrder = products;
