@@ -10,8 +10,12 @@ import create_secret_key from "./utils/create_secret_key.js";
 import cookieParser from "cookie-parser";
 var app = express();
 var port = process.env.SERVER_PORT || 8080;
-app.use(cors({ credentials: true, origin: true }));
-
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL,
+  })
+);
 app.use(
   session({
     secret: create_secret_key(),
