@@ -13,7 +13,7 @@ var port = process.env.SERVER_PORT || 8080;
 app.use(
   cors({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
   })
 );
 app.use(
