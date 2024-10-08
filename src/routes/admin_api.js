@@ -39,6 +39,7 @@ import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
+import upload from "../middleware/multer.js";
 const routeAPI = express.Router();
 
 // Employee
@@ -57,9 +58,11 @@ routeAPI.get("/product/mainpage", products.get_products_at_home);
 routeAPI.get("/product/detail", products.get_product_by_id);
 routeAPI.get("/product/limit", products.getProductlimit);
 routeAPI.get("/product/category", products.getProductByCategory);
+routeAPI.post("/product/add-product",upload.array("product", 5), products.add_product);
 
 //Category
-routeAPI.get("/category", category.getCategoryById);
+routeAPI.get("/category", category.getAllCategory);
+// routeAPI.get("/category", category.getCategoryById);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
