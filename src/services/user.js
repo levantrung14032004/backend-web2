@@ -75,7 +75,7 @@ const getAllOrder = async (userId) => {
 const getInfoById = async (id) => {
   try {
     const [result, fields] = await connection.execute(
-      `select fullname, email, address, phone_number from user where id = ?`,
+      `select first_name, last_name, fullname, email, address, phone_number from user where id = ?`,
       [id]
     );
     if (!result) {
@@ -211,7 +211,7 @@ export const get_publicKey_refreshToken = (id) =>
 export const changePassword = (id, password_current_input, new_password) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [user, fields] = await connection.execute(
+      const [user, fields] = await connection.query(
         "select password from user where id = ? ",
         [id]
       );
@@ -234,8 +234,8 @@ export const changePassword = (id, password_current_input, new_password) =>
         error: result[0].affectedRows === 1 ? 0 : 1,
         message:
           result[0].affectedRows === 1
-            ? "change password success"
-            : "change password fail",
+            ? "Đổi mật khẩu thành công"
+            : "Đổi mật khẩu thất bại",
       });
     } catch (error) {
       console.log(error);

@@ -116,18 +116,25 @@ export const changePassword = async (req, res) => {
   try {
     const new_password = req.body.new_password;
     const current_password = req.body.current_password;
+    const repeat_password = req.body.repeat_password;
 
-    if (!new_password || !current_password)
+    if (!new_password || !current_password || !repeat_password)
       return res.status(400).json({
         error: 1,
         message: "missing information",
       });
-    let rgPw = /^(?=.*[A-Z])(?=(?:.*\d){8,}).*$/;
+    if(new_password !== repeat_password){
+      return res.status(400).json({
+        error: 1,
+        message: "Nhập lại mật khẩu không đúng",
+      });
+    }
+    let rgPw = /^(?=.*[A-Z]).{8,}$/;
     if (!rgPw.test(new_password)) {
       return res.status(400).json({
         error: 1,
         message:
-          "Password must start with an uppercase letter and contain at least 8 digits.",
+          "Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất 1 ký tự viết hoa",
       });
     }
     const user_id = req.data.id;
@@ -140,6 +147,6 @@ export const changePassword = async (req, res) => {
     return res.status(response.error === 0 ? 200 : 401).json(response);
   } catch (error) {
     console.log(error);
-    return res.status(500).json(error);
+    return res.status(500).json({ error: 1, message: 'Đổi mật khẩu thất bại' });
   }
 };
