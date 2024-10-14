@@ -68,7 +68,7 @@ const handleEditInfoById = async (req, res) => {
 
 const handleAddOrder = async (req, res) => {
   try {
-    let user_id = req.body.userId;
+    let user_id = req.data.id;
     let fullname = req.body.fullname;
     let phoneNumber = req.body.phoneNumber;
     let address = req.body.address;
@@ -141,5 +141,68 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
+  }
+};
+
+export const handleGetAddressById = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const result = await userService.getAddressById(id);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(501).json("Khong lay duoc dia chi cua user nay");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(402).error(error);
+  }
+};
+
+export const handleAddAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const address = req.body.address;
+    const setdefault = req.body.setdefault;
+    const result = await userService.addAddress(id, address, setdefault);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(501).json("Khong them duoc dia chi");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(402).error(error);
+  }
+};
+
+export const handleDeleteAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const address = req.body.address;
+    const result = await userService.deleteAddress(id, address);
+    if (result) {
+      res.status(200).json("Xoa dia chi thanh cong");
+    } else {
+      res.status(501).json("Xoa dia chi that bai");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(402).error(error);
+  }
+};
+
+export const handleGetCouponUser = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const result = await userService.getCouponUser(id);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(501).json("Khong lay duoc coupon");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(402).error(error);
   }
 };

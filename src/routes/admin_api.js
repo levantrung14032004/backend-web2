@@ -25,7 +25,12 @@ import {
   handleCreateReceived,
 } from "../controllers/company.js";
 
-import { handleGetEmployee } from "../controllers/employee.js";
+import {
+  handleCreateEmployee,
+  handleGetCurentEmployee,
+  handleGetEmployee,
+  handleDeleteEmployee,
+} from "../controllers/employee.js";
 
 import { handleGetGoodsReceived } from "../controllers/received.js";
 
@@ -39,10 +44,14 @@ import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
+import { handleGetTotalWithDate } from "../controllers/order.js";
 const routeAPI = express.Router();
 
 // Employee
 routeAPI.get("/employee", handleGetEmployee);
+routeAPI.post("/employee", handleCreateEmployee);
+routeAPI.get("/employee-current", handleGetCurentEmployee);
+routeAPI.put("/employee", handleDeleteEmployee);
 
 // Permission
 routeAPI.get("/permissions", handleGetPermissions);
@@ -60,6 +69,7 @@ routeAPI.get("/product/category", products.getProductByCategory);
 
 //Category
 routeAPI.get("/category", category.getCategoryById);
+routeAPI.get("/all-category", category.getAllCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
@@ -79,6 +89,9 @@ routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/changePassword", userController.changePassword);
 
 routeAPI.post("/user/add_order", handleAddOrder);
+
+// Admin Order
+routeAPI.post("/order/totalDate", handleGetTotalWithDate);
 
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);

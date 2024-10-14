@@ -16,6 +16,7 @@ import {
   handleEditInfoById,
   handleAddOrder,
   handleGetAllUsers,
+  handleGetAddressById,
 } from "../controllers/user.js";
 
 import {
@@ -35,7 +36,6 @@ import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
-import route from "./web.js";
 import * as order from "../controllers/order.js";
 const routeAPI = express.Router();
 
@@ -62,9 +62,6 @@ routeAPI.get("/product/filter/title", handleSortTitle);
 // Temporary Product
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 
-// Temporary Product
-routeAPI.post("/creat-temp-product", handleCreateProductTemp);
-
 routeAPI.use(authenticateToken);
 // User
 routeAPI.get("/user", handleGetAllUsers);
@@ -73,7 +70,10 @@ routeAPI.get("/user/info", handleGetInfoById);
 // routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/changePassword", userController.changePassword);
 routeAPI.get("/user/order", order.getOrderByUser);
-
+routeAPI.get("/user/address", handleGetAddressById);
+routeAPI.post("/user/add-address", userController.handleAddAddress);
+routeAPI.delete("/user/delete-address", userController.handleDeleteAddress);
+routeAPI.get("/user/coupon", userController.handleGetCouponUser);
 
 routeAPI.post("/user/add_order", handleAddOrder);
 
@@ -93,5 +93,6 @@ routeAPI.get("/author", handleGetAuthors);
 routeAPI.get("/received", handleGetGoodsReceived);
 
 //order
+routeAPI.post("/order", order.handleCreateOrder);
 
 export default routeAPI;

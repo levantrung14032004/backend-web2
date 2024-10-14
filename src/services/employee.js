@@ -15,4 +15,63 @@ const getEmployee = async () => {
   }
 };
 
-export { getEmployee };
+const createEmployee = async (value) => {
+  try {
+    const [result, other] = await connection.execute(
+      `insert into employee(role_id, fullname, email, password,phone_number,address,status) value(?,?,?,?,?,?,?)`,
+      [
+        parseInt(value.role),
+        value.fullname,
+        value.email,
+        value.password,
+        value.phone_number,
+        value.address,
+        1,
+      ]
+    );
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const getCurrentEmployee = async (id) => {
+  try {
+    const [result, other] = await connection.execute(
+      `select * from employee where id = ${id}`
+    );
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const deleteCurrentEmployee = async (id) => {
+  try {
+    const [result, other] = await connection.execute(
+      `update employee set status =0 where id = ${id}`
+    );
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export {
+  getEmployee,
+  createEmployee,
+  getCurrentEmployee,
+  deleteCurrentEmployee,
+};

@@ -14,3 +14,18 @@ export const getOrderByUser = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const handleCreateOrder = (req, res) => {
+  const values = req.body;
+  console.log(values);
+};
+
+export const handleGetTotalWithDate = async (req, res) => {
+  try {
+    const date = req.body.date;
+    const total = await orderService.getTotalWithDate(date);
+    res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};

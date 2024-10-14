@@ -52,17 +52,18 @@ export const getCategoryById = (id) =>
       });
     }
   });
-export const getAllCategory = () => new Promise(async (resolve, reject) => {
-  try {
-    const [rows, fields] = await connection.query(
-      "SELECT * from category where status = 1"
-    );
-    resolve(rows);
-  } catch (error) {
-    console.log(error);
-    reject({
-      error: 1,
-      message: error,
-    });
-  }
-})
+export const getAllCategory = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(
+        "SELECT name as label, id as value from category where status = 1"
+      );
+      resolve(rows);
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
+  });

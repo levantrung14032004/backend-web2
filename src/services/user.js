@@ -34,9 +34,9 @@ const getAllOrder = async (userId) => {
   try {
     const [result, fields] = await connection.execute(
       `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status
-          from myweb.order o
-          join myweb.order_detail od on o.id = od.order_id
-          join myweb.product p on p.id = od.product_id
+          from ${process.env.DATABASE_NAME}.order o
+          join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
+          join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
           where o.user_id = ?;`,
       [userId]
     );
@@ -115,7 +115,7 @@ const addOrder = async (
 ) => {
   try {
     await connection.execute(
-      `INSERT INTO myweb.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),2)`,
+      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),2)`,
       [
         user_id,
         employeeId,
@@ -129,7 +129,7 @@ const addOrder = async (
       ]
     );
     const [lastId, another] = await connection.query(
-      `SELECT id FROM myweb.order ORDER BY id DESC LIMIT 1;`
+      `SELECT id FROM ${process.env.DATABASE_NAME}.order ORDER BY id DESC LIMIT 1;`
     );
 
     const productsInOrder = products;
@@ -241,3 +241,80 @@ export const changePassword = (id, password_current_input, new_password) =>
       reject(error);
     }
   });
+
+export const getAddressById = async (id) => {
+  try {
+    const [result, other] = await connection.execute(
+      `select * from addressDetail where id_user = ${id}`
+    );
+    if (result) {
+      const addressFormat = result.reduce((acc, cur) => {
+        const existId = acc.find((item) => item.id === cur.id_user);
+        if (existId) {
+          existId.addressList.push({
+            address: cur.address,
+            default: cur.setdefault,
+          });
+        } else {
+          acc.push({
+            id: cur.id_user,
+            addressList: [{ address: cur.address, default: cur.setdefault }],
+          });
+        }
+        return acc;
+      }, []);
+      return addressFormat;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const addAddress = async (id, address, defaultAddress) => {
+  try {
+    await connection.execute(
+      `INSERT INTO addressDetail (id_user, address, setdefault) VALUES (?, ?, ?)`,
+      [id, address, defaultAddress]
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+export const deleteAddress = async (id, address) => {
+  try {
+    await connection.execute(
+      `DELETE FROM addressDetail WHERE id = ? and address = ?`,
+      [id, address]
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+export const getCouponUser = async (id) => {
+  try {
+    const [coupon_for_user, by] = await connection.execute(
+      `select * from coupon_for_user where id_user = ${id}`
+    );
+    const [result, other] = await connection.execute(`select * from coupon`);
+    if (result) {
+      return {
+        id: coupon_for_user.id_user,
+        coupons: [...result, ...coupon_for_user],
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
