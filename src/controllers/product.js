@@ -117,16 +117,17 @@ export const add_product = async (req, res) => {
     const uploadPromises = files.map((file) => uploadIMG_service(file));
     const url_images = await Promise.all(uploadPromises);
     //add product
-    const category_id = req.body.category;
+    const categories = req.body.category;
     const author_id = req.body.author || null;
     const title = req.body.name;
     const url_img = url_images[0].URL;
     const description = req.body.description;
-    if (!category_id || !title || !url_img || !description) {
+
+    if (!categories || !title || !url_img || !description) {
       return res.status(400).json("Missing information");
     }
     const add_product_response = await productService.addProduct(
-      category_id,
+      JSON.parse(categories),
       author_id,
       title,
       url_img,
@@ -200,7 +201,7 @@ export const get_product_by_id = async (req, res) => {
 export const getProductlimit = async (req, res) => {
   try {
     const limit = req.query.limit;
-    if(!limit){
+    if (!limit) {
       return res.status(400).json("Missing limit");
     }
     const result = await productService.getProductlimit(limit);
@@ -210,15 +211,14 @@ export const getProductlimit = async (req, res) => {
   }
 };
 export const getProductByCategory = async (req, res) => {
-  try{
+  try {
     const id = req.query.id;
-    if(!id){
+    if (!id) {
       return res.status(400).json("Missing id category");
     }
     const result = await productService.getProductByCategory(id);
     return res.status(200).json(result);
-  }
-  catch(error){
+  } catch (error) {
     return res.status(500).json(error);
   }
-}
+};

@@ -21,6 +21,13 @@ const io = new SocketIOServer(server, {
   },
 });
 app.use(cors({ credentials: true, origin: true }));
+var port = process.env.SERVER_PORT || 8080;
+app.use(
+  cors({
+    credentials: true,
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
+  })
+);
 app.use(
   session({
     secret: create_secret_key(),
@@ -82,8 +89,8 @@ io.on("connection", (socket) => {
 var port = process.env.SERVER_PORT || 8080;
 
 app.use("/static", express.static("public"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 app.use("/", router);
 app.use("/api/v2", routerAdmin);
