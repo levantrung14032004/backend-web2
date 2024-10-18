@@ -29,3 +29,37 @@ export const handleGetTotalWithDate = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const handleGetTopSelling = async (req, res) => {
+  try {
+    const topSelling = await orderService.getTopSelling();
+    if (topSelling) {
+      res.status(200).json(topSelling);
+    } else {
+      res.status(404).json({
+        error: 1,
+        message: "No data found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetDashDtoD = async (req, res) => {
+  try {
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    if (!startDate || !endDate || Date.parse(endDate) < Date.parse(startDate)) {
+      res.status(200).json({
+        error: 1,
+        message: "Thời gian xác định không đúng",
+      });
+    } else {
+      const totalValues = await orderService.getDashDtoD(startDate, endDate);
+      res.status(200).json(totalValues);
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};

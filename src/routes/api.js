@@ -75,13 +75,10 @@ routeAPI.get("/user/info", handleGetInfoById);
 // routeAPI.put("/user/info", handleEditInfoById);
 routeAPI.post("/user/changePassword", userController.changePassword);
 routeAPI.get("/user/order", order.getOrderByUser);
-<<<<<<< HEAD
 routeAPI.get("/user/address", handleGetAddressById);
 routeAPI.post("/user/add-address", userController.handleAddAddress);
 routeAPI.delete("/user/delete-address", userController.handleDeleteAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
-=======
->>>>>>> 6860c619c87cc4fac6a94872f247a7e1ccc2c98b
 
 routeAPI.post("/user/add_order", handleAddOrder);
 

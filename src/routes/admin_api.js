@@ -37,6 +37,7 @@ import { handleGetGoodsReceived } from "../controllers/received.js";
 import {
   handleGetPermissions,
   handleGetRole,
+  handleSetPermission,
 } from "../controllers/permission.js";
 
 import { handleGetAuthors } from "../controllers/author.js";
@@ -45,8 +46,19 @@ import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
 import upload from "../middleware/multer.js";
-import { handleGetTotalWithDate } from "../controllers/order.js";
+import {
+  handleGetDashDtoD,
+  handleGetTopSelling,
+  handleGetTotalWithDate,
+} from "../controllers/order.js";
+import {
+  handleRegisterEmployee,
+  handleLoginEmployee,
+} from "../controllers/adminAuth.js";
 const routeAPI = express.Router();
+// Auth
+routeAPI.post("/auth/register", handleRegisterEmployee);
+routeAPI.post("/auth/login", handleLoginEmployee);
 
 // Employee
 routeAPI.get("/employee", handleGetEmployee);
@@ -57,6 +69,7 @@ routeAPI.put("/employee", handleDeleteEmployee);
 // Permission
 routeAPI.get("/permissions", handleGetPermissions);
 routeAPI.get("/role", handleGetRole);
+routeAPI.put("/role-change", handleSetPermission);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
@@ -67,7 +80,11 @@ routeAPI.get("/product/mainpage", products.get_products_at_home);
 routeAPI.get("/product/detail", products.get_product_by_id);
 routeAPI.get("/product/limit", products.getProductlimit);
 routeAPI.get("/product/category", products.getProductByCategory);
-routeAPI.post("/product/add-product",upload.array("product", 5), products.add_product);
+routeAPI.post(
+  "/product/add-product",
+  upload.array("product", 5),
+  products.add_product
+);
 
 //Category
 routeAPI.get("/category", category.getAllCategory);
@@ -95,6 +112,8 @@ routeAPI.post("/user/add_order", handleAddOrder);
 
 // Admin Order
 routeAPI.post("/order/totalDate", handleGetTotalWithDate);
+routeAPI.get("/order/top-selling", handleGetTopSelling);
+routeAPI.post("/order/date-to-date", handleGetDashDtoD);
 
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);

@@ -1,4 +1,8 @@
-import { getPermissions, getRole } from "../services/permission.js";
+import {
+  getPermissions,
+  getRole,
+  setPermision,
+} from "../services/permission.js";
 
 const handleGetPermissions = async (req, res) => {
   try {
@@ -28,4 +32,21 @@ const handleGetRole = async (req, res) => {
   }
 };
 
-export { handleGetPermissions, handleGetRole };
+const handleSetPermission = async (req, res) => {
+  try {
+    const change = JSON.parse(req.body.change);
+    if (change.length === 0) {
+      res.status(200).json("Không có gì thay đổi");
+      return;
+    }
+    change.forEach((item) => {
+      setPermision(item.employeeId, item.permission_code, checked);
+    });
+    res.status(200).json("Thay đổi thành công");
+  } catch (error) {
+    console.log(error);
+    res.status(401).error(error.message);
+  }
+};
+
+export { handleGetPermissions, handleGetRole, handleSetPermission };

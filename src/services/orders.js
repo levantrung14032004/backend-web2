@@ -33,3 +33,45 @@ export const getTotalWithDate = async (date) => {
     return null;
   }
 };
+
+export const getTopSelling = async () => {
+  try {
+    const [rows, fields] = await connection.execute(
+      `SELECT p.title,p.thumbnail, SUM(od.num) AS total_sales
+FROM product p
+JOIN order_detail od ON p.id = od.product_id
+LEFT JOIN gallery g ON p.id = g.product_id
+LEFT JOIN author a ON p.author_id = a.id
+GROUP BY p.id
+ORDER BY total_sales DESC
+LIMIT 6`
+    );
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getDashDtoD = async (startDate, endDate) => {
+  try {
+    const [totalValues, fields] = await connection.execute(
+      `SELECT SUM(total_money) AS total_revenue FROM myweb.order WHERE DATE(order_date) BETWEEN ? AND ?`,
+      [startDate, endDate]
+    );
+
+    const [totalOrders, fields2] = await connection.execute(
+      `SELECT COUNT(*) AS total_orders FROM myweb.order WHERE DATE(order_date) BETWEEN ? AND ?`,
+      [startDate, endDate]
+    );
+    if (totalValues && totalOrders) {
+      return {
+        total_revenue: totalValues[0].total_revenue,
+        total_orders: totalOrders[0].total_orders,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
