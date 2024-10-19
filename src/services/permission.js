@@ -16,4 +16,16 @@ const getRole = async () => {
   return null;
 };
 
-export { getPermissions, getRole };
+const setPermision = async (id, code, value) => {
+  try {
+    await connection.execute(
+      `update role_detail set check_action = ${
+        value ? 1 : 0
+      } where role_id = ${id} and action_code = ${code}`
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { getPermissions, getRole, setPermision };
