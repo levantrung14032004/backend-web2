@@ -88,19 +88,25 @@ const getInfoById = async (id) => {
   }
 };
 
-const editInfo = async (firstName, lastName, fullName, id) => {
-  try {
-    const [result, fields] = await connection.execute(
-      `UPDATE user SET first_name = ?, last_name = ?, fullname = ? WHERE id = ?`,
-      [firstName, lastName, fullName, id]
-    );
-    if (result) {
-      return result;
+const editInfo = (firstName, lastName, fullName, id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result, fields] = await connection.execute(
+        `UPDATE user SET first_name = ?, last_name = ?, fullname = ? WHERE id = ?`,
+        [firstName, lastName, fullName, id]
+      );
+      resolve({
+        error: result.affectedRows === 0 ? 1 : 0,
+        message:
+          result.affectedRows === 0
+            ? "Update info failed"
+            : "Update info successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  });
 
 const addOrder = async (
   user_id,
@@ -194,7 +200,7 @@ export const get_publicKey_accessToken = (id) =>
 export const get_publicKey_refreshToken = (id) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [result, fields] = await connection.execute(
+      const [result, fields] = await connection.query(
         `SELECT publicKey_RefreshToken FROM user WHERE id = ?`,
         [id]
       );
@@ -242,7 +248,78 @@ export const changePassword = (id, password_current_input, new_password) =>
       reject(error);
     }
   });
-
+export const changeInfo = (
+  id,
+  firstName,
+  lastName,
+  fullName,
+  password,
+  new_password
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const client = await connection.getConnection();
+      await client.beginTransaction();
+      const [names] = await client.execute(
+        "update user set first_name = ?, last_name = ?, fullname = ? where id = ?",
+        [firstName, lastName, fullName, id]
+      );
+      if (names.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Cập nhật thông tin thất bại",
+        });
+        return;
+      }
+      if (password && new_password) {
+        const [password_DB] = await client.query(
+          "select password from user where id = ?",
+          [id]
+        );
+        if (password_DB.length === 0) {
+          await client.rollback();
+          resolve({
+            error: 1,
+            message: "Cập nhật thông tin thất bại",
+          });
+          return;
+        }
+        const password_current = password_DB[0].password;
+        const checkPassword =
+          password_current && bcrypt.compareSync(password, password_current);
+        if (!checkPassword) {
+          await client.rollback();
+          resolve({
+            error: 1,
+            message: "Mật khẩu không đúng",
+          });
+          return;
+        }
+        const hash_new_password = bcrypt.hashSync(new_password, 10);
+        const result = await client.execute(
+          "update user set password = ? where id = ?",
+          [hash_new_password, id]
+        );
+        if (result[0].affectedRows === 0) {
+          await client.rollback();
+          resolve({
+            error: 1,
+            message: "Cập nhật thông tin thất bại",
+          });
+          return;
+        }
+      }
+      await client.commit();
+      resolve({
+        error: 0,
+        message: "Cập nhật thông tin thành công",
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
 export const getAddressById = async (id) => {
   try {
     const [result, other] = await connection.execute(

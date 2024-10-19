@@ -8,7 +8,10 @@ const handleGetAuthors = async (req, res) => {
     } else {
       res.status(404).json("Co loi tu server");
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "error" });
+  }
 };
 
 export { handleGetAuthors };
