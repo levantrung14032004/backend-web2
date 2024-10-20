@@ -2,6 +2,7 @@ import {
   getPermissions,
   getRole,
   setPermision,
+  getActionById,
 } from "../services/permission.js";
 
 const handleGetPermissions = async (req, res) => {
@@ -49,4 +50,22 @@ const handleSetPermission = async (req, res) => {
   }
 };
 
-export { handleGetPermissions, handleGetRole, handleSetPermission };
+const handleGetActionById = async (req, res) => {
+  try {
+    const role_id = req.employee.role_id;
+    const result = await getActionById(role_id);
+    if (result) {
+      res.status(200).json(result);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).error(error.message);
+  }
+};
+
+export {
+  handleGetPermissions,
+  handleGetRole,
+  handleSetPermission,
+  handleGetActionById,
+};

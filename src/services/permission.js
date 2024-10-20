@@ -28,4 +28,14 @@ const setPermision = async (id, code, value) => {
   }
 };
 
-export { getPermissions, getRole, setPermision };
+const getActionById = async (id) => {
+  const [values, field] = await connection.execute(
+    `select action_code, check_action from role_detail where role_id = ${id}`
+  );
+  if (values) {
+    return values;
+  }
+  return null;
+};
+
+export { getPermissions, getRole, setPermision, getActionById };
