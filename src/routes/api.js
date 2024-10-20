@@ -52,7 +52,9 @@ routeAPI.get("/product/mainpage", products.get_products_at_home);
 routeAPI.get("/product/detail", products.get_product_by_id);
 routeAPI.get("/product/limit", products.getProductlimit);
 routeAPI.get("/product/category", products.getProductByCategory);
+// Authors
 
+routeAPI.get("/author", handleGetAuthors);
 //Category
 routeAPI.get("/category", category.getAllCategory);
 //Product.Filter
@@ -72,8 +74,7 @@ routeAPI.post("/cart/removeFromCart", cart.removeFromCart);
 routeAPI.get("/user", handleGetAllUsers);
 routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
-// routeAPI.put("/user/info", handleEditInfoById);
-routeAPI.post("/user/changePassword", userController.changePassword);
+routeAPI.put("/user/info/edit", userController.changeInfo);
 routeAPI.get("/user/order", order.getOrderByUser);
 routeAPI.get("/user/address", handleGetAddressById);
 routeAPI.post("/user/add-address", userController.handleAddAddress);
@@ -89,10 +90,6 @@ routeAPI.post("/create-received", handleCreateReceived);
 routeAPI.get("/company", handleGetCompany);
 routeAPI.post("/company", handleInsertCompany);
 routeAPI.put("/company", handleDeleteCompany);
-
-// Authors
-
-routeAPI.get("/author", handleGetAuthors);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);

@@ -19,15 +19,8 @@ export const addToCart = async (req, res) => {
     console.log("id_user", id_user);
     return res.status(400).json({ message: "Missing required fields" });
   }
-  const { id_product, quantity, price, product_title, product_thumbnail } =
-    req.body;
-  if (
-    !id_product ||
-    !quantity ||
-    !price ||
-    !product_title ||
-    !product_thumbnail
-  ) {
+  const { id_product, quantity, price } = req.body;
+  if (!id_product || !quantity || !price) {
     return res.status(400).json({ message: "Missing required fields" });
   }
   if (isNaN(quantity) || isNaN(price)) {
@@ -43,9 +36,7 @@ export const addToCart = async (req, res) => {
       id_product,
       quantity,
       price,
-      total_price,
-      product_title,
-      product_thumbnail
+      total_price
     );
     res.status(201).json(response);
   } catch (error) {

@@ -10,41 +10,6 @@ export const handleGetAllProducts = async (req, res) => {
   } catch (error) {
     return res.status(500).json(error.message);
   }
-  // let { products, category } = await product.getProduct();
-  // const cateDetail = category.reduce((acc, cur) => {
-  //   const exist = acc.find((item) => item.id === cur.id_Product);
-  //   if (exist) {
-  //     exist.cate.push({ cate_id: cur.id_Category });
-  //   } else {
-  //     acc.push({
-  //       id: cur.id_Product,
-  //       cate: [{ cate_id: cur.id_Category }],
-  //     });
-  //   }
-  //   return acc;
-  // }, []);
-  // const result = products.reduce((acc, cur) => {
-  //   const exist = acc.find((item) => item.id === cur.id);
-  //   let catevalue;
-  //   if (exist) {
-  //     catevalue = cateDetail.find((item) => item.id === exist.id_Product);
-  //     console.log(catevalue);
-  //     exist.category_id = catevalue.cate;
-  //   } else {
-  //     catevalue = cateDetail.find((item) => item.id === cur.id);
-  //     console.log(catevalue);
-  //     acc.push({
-  //       ...cur,
-  //       category_id: catevalue ? catevalue.cate : [],
-  //     });
-  //   }
-  //   return acc;
-  // }, []);
-  // if (result.length > 0) {
-  //   res.status(200).json(result);
-  // } else {
-  //   res.status(404).json("error");
-  // }
 };
 
 export const handleSearchProducts = async (req, res) => {

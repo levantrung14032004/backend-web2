@@ -10,7 +10,7 @@ export const getCart = (id_user) =>
         return resolve(cartRD);
       }
       const [rows, fields] = await connection.query(
-        "SELECT * FROM cart WHERE id_user = ?",
+        "SELECT c.* , title as product_title ,thumbnail as product_thumbnail FROM cart c join product p on id_product = id WHERE id_user = ?",
         [id_user]
       );
       if (rows.length === 0) {
@@ -37,30 +37,12 @@ export const getCart = (id_user) =>
       return resolve(null);
     }
   });
-export const addToCart = (
-  id_user,
-  id_product,
-  quantity,
-  price,
-  total_price,
-  product_title,
-  product_thumbnail
-) =>
+export const addToCart = (id_user, id_product, quantity, price, total_price) =>
   new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "INSERT INTO cart (id_user, id_product, quantity, price,total_price,product_title,product_thumbnail) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE quantity = quantity + ?, total_price =  quantity * ?",
-        [
-          id_user,
-          id_product,
-          quantity,
-          price,
-          total_price,
-          product_title,
-          product_thumbnail,
-          quantity,
-          price,
-        ]
+        "INSERT INTO cart (id_user, id_product, quantity, price,total_price) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE quantity = quantity + ?, total_price =  quantity * ?",
+        [id_user, id_product, quantity, price, total_price, quantity, price]
       );
       resolve({
         error: result.affectedRows === 0 ? 1 : 0,
@@ -69,6 +51,17 @@ export const addToCart = (
             ? "Thêm sản phẩm vào giỏ hàng thất bại"
             : "Thêm sản phẩm vào giỏ hàng thành công",
       });
+      if (result.affectedRows === 0) {
+        return;
+      }
+      const [product] = await connection.query(
+        "SELECT c.* , title as product_title ,thumbnail as product_thumbnail FROM cart c join product p on id_product = id WHERE id_user = ? and id_product = ?",
+        [id_user, id_product]
+      );
+      if (product.length === 0) {
+        return;
+      }
+      const { product_title, product_thumbnail } = product[0];
       const cartKey = `cart:${id_user}`;
       const existingProduct = await client.hGet(
         cartKey,
@@ -85,7 +78,7 @@ export const addToCart = (
           price: parseInt(price),
           total_price: existingProduct
             ? (JSON.parse(existingProduct).quantity + parseInt(quantity)) *
-              parseInt(total_price)
+              parseInt(price)
             : parseInt(total_price),
           name: product_title,
           thumbnail: product_thumbnail,

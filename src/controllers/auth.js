@@ -2,6 +2,7 @@ import * as authService from "../services/auth.js";
 import * as userService from "../services/user.js";
 import create_token from "../utils/create_token.js";
 import jwt from "jsonwebtoken";
+import connection from "../database/database.js";
 export const login = async (req, res) => {
   try {
     const email = req.body.email;
@@ -156,7 +157,8 @@ export const refresh_token = async (req, res) => {
       }
     );
   } catch (err) {
-    return res.status(500).json(err);
+    console.log(err);
+    return res.status(500).json({message: "Internal server error"});
   }
 };
 export const check_status = async (req, res) => {
