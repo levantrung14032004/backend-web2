@@ -31,6 +31,7 @@ const uploadIMG_service = (file) =>
         URL: downloadURL,
       });
     } catch (error) {
+      console.log(error);
       reject({
         error: 1,
         message: error,

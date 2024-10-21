@@ -4,6 +4,7 @@ import {
   addAuthor,
   updateAuthor,
 } from "../services/author.js";
+import uploadIMG_service from "../services/uploadIMG.js";
 
 const handleGetAuthors = async (req, res) => {
   try {
@@ -21,16 +22,24 @@ const handleGetAuthors = async (req, res) => {
 
 const handleAddAuthor = async (req, res) => {
   try {
-    const { name, thumbnail, information } = req.body;
-    const result = await addAuthor([name, thumbnail, information]);
-    if (result) {
-      res.status(201).json("Them tac gia thanh cong");
-    } else {
-      res.status(404).json("Co loi tu server");
+    const { name, information } = req.body;
+    const thumbnail = req.file;
+    if (!thumbnail) {
+      return res.status(400).json("Thiếu ảnh đại diện");
     }
+    const uploadIMG = await uploadIMG_service(thumbnail);
+    if (uploadIMG.error === 1) {
+      return res.status(400).json("Lưu ảnh thất bại");
+    }
+    console.log(req.body);
+    if (!name || !information) {
+      return res.status(400).json("Thiếu thông tin");
+    }
+    const result = await addAuthor(name.trim(), uploadIMG.URL, information);
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    res.status(404).json("Co loi tu server {catch}");
+    return res.status(500).json("Thêm tác giả thất bại");
   }
 };
 
