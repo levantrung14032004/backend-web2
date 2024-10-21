@@ -1,6 +1,5 @@
 import {
   handleGetAllProducts,
-  handleSearchProducts,
   handleDeleteProduct,
   handleSortTitle,
   handleSortLowToHigh,
@@ -11,7 +10,6 @@ import {
 import { handleCreateProductTemp } from "../controllers/tempProduct.js";
 
 import {
-  handleGetAllOrder,
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
@@ -35,13 +33,13 @@ import {
 import { handleGetGoodsReceived } from "../controllers/received.js";
 
 import {
+  handleGetActionById,
   handleGetPermissions,
   handleGetRole,
   handleSetPermission,
 } from "../controllers/permission.js";
 
 import { handleGetAuthors, handleAddAuthor } from "../controllers/author.js";
-import * as userController from "../controllers/user.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
@@ -54,34 +52,36 @@ import {
 import {
   handleRegisterEmployee,
   handleLoginEmployee,
+  handleLogOut,
 } from "../controllers/adminAuth.js";
+
+import { verifyToken } from "../middleware/jwt_admin.js";
+import { getActionById } from "../services/permission.js";
 const routeAPI = express.Router();
 // Auth
 routeAPI.post("/auth/register", handleRegisterEmployee);
 routeAPI.post("/auth/login", handleLoginEmployee);
+routeAPI.post("/auth/logout", verifyToken, handleLogOut);
 
 // Employee
-routeAPI.get("/employee", handleGetEmployee);
-routeAPI.post("/employee", handleCreateEmployee);
+routeAPI.get("/employee", verifyToken, handleGetEmployee);
+routeAPI.post("/employee", verifyToken, handleCreateEmployee);
 routeAPI.get("/employee-current", handleGetCurentEmployee);
-routeAPI.put("/employee", handleDeleteEmployee);
+routeAPI.put("/employee", verifyToken, handleDeleteEmployee);
 
 // Permission
-routeAPI.get("/permissions", handleGetPermissions);
+routeAPI.get("/permissions", verifyToken, handleGetPermissions);
 routeAPI.get("/role", handleGetRole);
-routeAPI.put("/role-change", handleSetPermission);
+routeAPI.put("/role-change", verifyToken, handleSetPermission);
+routeAPI.get("/role-by-id", verifyToken, handleGetActionById);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", handleGetAllProducts);
-routeAPI.get("/search", handleSearchProducts);
-routeAPI.put("/product", handleDeleteProduct); // route này phải để ở admin phải có xác thực mới được xóa sửa lại đi nha
-routeAPI.get("/product/mainpage", products.get_products_at_home);
-routeAPI.get("/product/detail", products.get_product_by_id);
-routeAPI.get("/product/limit", products.getProductlimit);
-routeAPI.get("/product/category", products.getProductByCategory);
+routeAPI.put("/product", verifyToken, handleDeleteProduct);
 routeAPI.post(
   "/product/add-product",
+  verifyToken,
   upload.array("product", 5),
   products.add_product
 );
@@ -102,11 +102,9 @@ routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 
 // User
-routeAPI.get("/user", handleGetAllUsers);
-routeAPI.post("/user/orders", handleGetAllOrder);
-routeAPI.get("/user/info", handleGetInfoById);
-routeAPI.put("/user/info", handleEditInfoById);
-routeAPI.post("/user/changePassword", userController.changePassword);
+routeAPI.get("/user", verifyToken, handleGetAllUsers);
+routeAPI.get("/user/info", verifyToken, handleGetInfoById);
+routeAPI.put("/user/info", verifyToken, handleEditInfoById);
 
 routeAPI.post("/user/add_order", handleAddOrder);
 

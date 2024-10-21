@@ -7,15 +7,16 @@ import {
   updateRefreshToken,
   deleteRefreshToken,
 } from "../services/adminAuth.js";
+import { getActionById } from "../services/permission.js";
 
 const generateAccessToken = (employee) => {
   return jwt.sign(employee, process.env.ACCESS_KEY, {
-    expiresIn: process.env.expiresIn_JWT,
+    expiresIn: "5m",
   });
 };
 
 const generateRefreshToken = (employee) => {
-  return jwt.sign(employee, process.env.REFRESH_KEY), { expiresIn: "365d" };
+  return jwt.sign(employee, process.env.REFRESH_KEY, { expiresIn: "7d" });
 };
 
 const handleRegisterEmployee = async (req, res) => {
@@ -54,7 +55,7 @@ const handleLoginEmployee = async (req, res) => {
   try {
     const employee = await findEmployeeByEmail(req.body.email);
     if (!employee) {
-      res.status(401).json("Email không tồn tại");
+      res.status(401).json({ message: "Email không tồn tại" });
       return;
     } else {
       const validPassword = await bcrypt.compare(
@@ -62,14 +63,19 @@ const handleLoginEmployee = async (req, res) => {
         employee[0].password
       );
       if (!validPassword) {
-        res.status(401).json("Mật khẩu không chính xác");
+        res.status(401).json({ message: "Mật khẩu không chính xác" });
         return;
       }
       if (employee && validPassword) {
-        const accessToken = generateAccessToken(employee[0]);
-        const refreshToken = generateRefreshToken(employee[0]);
+        const actionRole = await getActionById(employee[0].role_id);
+        const employeeAction = { ...employee[0], actionRole };
+        const accessToken = generateAccessToken(employeeAction);
+        const refreshToken = generateRefreshToken(employeeAction);
         res.cookie("refreshToken", refreshToken, { httpOnly: true });
-        res.status(200).json({ message: "Đăng nhập thành công", accessToken });
+        await updateRefreshToken(employee[0].id, refreshToken);
+        res
+          .status(200)
+          .json({ code: 1, message: "Đăng nhập thành công", accessToken });
       }
     }
   } catch (error) {
@@ -89,7 +95,7 @@ const requestRefreshToken = async (req, res) => {
       } else {
         const accessToken = generateAccessToken();
         const refreshToken = generateRefreshToken();
-        updateRefreshToken(req.employee.id, refreshToken);
+        await updateRefreshToken(req.employee.id, refreshToken);
         res.status(200).json({ accessToken });
       }
     }

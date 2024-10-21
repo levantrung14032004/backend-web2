@@ -49,7 +49,7 @@ const getRefreshTokenById = async (id) => {
 const updateRefreshToken = async (id, refreshToken) => {
   try {
     await connection.execute(
-      "update employee set refresh_token = ? where id = ?",
+      "update employee set refreshtoken = ? where id = ?",
       [refreshToken, id]
     );
   } catch (error) {
@@ -60,7 +60,7 @@ const updateRefreshToken = async (id, refreshToken) => {
 const deleteRefreshToken = async (id) => {
   try {
     await connection.execute(
-      "update employee set refresh_token = null where id = ?",
+      "update employee set refreshtoken = null where id = ?",
       [id]
     );
   } catch (error) {
