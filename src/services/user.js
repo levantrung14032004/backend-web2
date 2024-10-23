@@ -377,22 +377,24 @@ export const deleteAddress = async (id, address) => {
   }
 };
 
-export const getCouponUser = async (id) => {
-  try {
-    const [coupon_for_user, by] = await connection.execute(
-      `select * from coupon_for_user where id_user = ${id}`
-    );
-    const [result, other] = await connection.execute(`select * from coupon`);
-    if (result) {
-      return {
-        id: coupon_for_user.id_user,
-        coupons: [...result, ...coupon_for_user],
-      };
-    } else {
-      return null;
+export const getCouponUser = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [coupon_for_user] = await connection.query(
+        "select * from coupon_for_user where id_user = ?",
+        [id]
+      );
+      const [result, other] = await connection.query("select * from coupon");
+      if (result) {
+        resolve({
+          id: coupon_for_user[0] ? coupon_for_user[0].id : null,
+          coupons: [...result, ...coupon_for_user],
+        });
+      } else {
+        resolve(null);
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
     }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+  });

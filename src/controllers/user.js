@@ -272,12 +272,12 @@ export const handleGetCouponUser = async (req, res) => {
     const id = req.data.id;
     const result = await userService.getCouponUser(id);
     if (result) {
-      res.status(200).json(result);
+      return res.status(200).json(result);
     } else {
-      res.status(501).json("Khong lay duoc coupon");
+       return res.status(501).json("Khong lay duoc coupon");
     }
   } catch (error) {
     console.log(error);
-    res.status(402).error(error);
+    return res.status(500).error(error);
   }
 };
