@@ -40,7 +40,7 @@ import {
   handleSetPermission,
 } from "../controllers/permission.js";
 
-import { handleGetAuthors } from "../controllers/author.js";
+import { handleGetAuthors, handleAddAuthor } from "../controllers/author.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
@@ -126,6 +126,7 @@ routeAPI.put("/company", handleDeleteCompany);
 // Authors
 
 routeAPI.get("/author", handleGetAuthors);
+routeAPI.post("/author/add", upload.single("author"), handleAddAuthor);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);

@@ -62,23 +62,38 @@ export const addProduct = (
 ) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [result, fields] = await connection.execute(
+      const client = await connection.getConnection();
+      const [result, fields] = await client.execute(
         "INSERT INTO product(author_id, title, thumbnail, description,created_at,update_at, status) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)",
         [author_id, title, url_img, description]
       );
+      if (result.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "error",
+        });
+        return;
+      }
       const placeholders = categories.map(() => "(?, ?)").join(", ");
       const sql = `INSERT INTO product_category (id_Product, id_Category) VALUES ${placeholders}`;
       const values = [];
       categories.forEach((id_Category) => {
         values.push(result.insertId, id_Category);
       });
-      const cate = await connection.execute(sql, values);
+      const cate = await client.execute(sql, values);
+      if (cate[0].affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "error",
+        });
+        return;
+      }
+      await client.commit();
       resolve({
-        error: result.affectedRows === 0 && cate[0].affectedRows === 0 ? 1 : 0,
-        message:
-          result.affectedRows === 0 && cate[0].affectedRows
-            ? "error"
-            : "success",
+        error: 0,
+        message: "success",
         id: result.insertId,
       });
     } catch (error) {
