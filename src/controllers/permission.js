@@ -3,6 +3,7 @@ import {
   getRole,
   setPermision,
   getActionById,
+  getActionView,
 } from "../services/permission.js";
 
 const handleGetPermissions = async (req, res) => {
@@ -63,9 +64,29 @@ const handleGetActionById = async (req, res) => {
   }
 };
 
+const handleGetActionView = async (req, res) => {
+  try {
+    const role_id = req.employee.role_id;
+    const result = await getActionView(role_id);
+    const fixed = result.reduce((acc, item) => {
+      if (item.action === "view") {
+        acc[item.entity] = true;
+      }
+      return acc;
+    }, {});
+    if (fixed) {
+      res.status(200).json(fixed);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).error(error.message);
+  }
+};
+
 export {
   handleGetPermissions,
   handleGetRole,
   handleSetPermission,
   handleGetActionById,
+  handleGetActionView,
 };

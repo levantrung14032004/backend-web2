@@ -38,4 +38,18 @@ const getActionById = async (id) => {
   return null;
 };
 
-export { getPermissions, getRole, setPermision, getActionById };
+const getActionView = async (id) => {
+  const [values, field] = await connection.execute(
+    `select rp.role_id, p.entity,p.action from role_permissions rp join permissions p 
+    on rp.permission_id = p.id where rp.role_id = ${id} 
+    and 
+    p.action like "view"
+`
+  );
+  if (values) {
+    return values;
+  }
+  return null;
+};
+
+export { getPermissions, getRole, setPermision, getActionById, getActionView };

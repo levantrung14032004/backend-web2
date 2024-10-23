@@ -34,6 +34,7 @@ import { handleGetGoodsReceived } from "../controllers/received.js";
 
 import {
   handleGetActionById,
+  handleGetActionView,
   handleGetPermissions,
   handleGetRole,
   handleSetPermission,
@@ -74,6 +75,7 @@ routeAPI.get("/permissions", verifyToken, handleGetPermissions);
 routeAPI.get("/role", handleGetRole);
 routeAPI.put("/role-change", verifyToken, handleSetPermission);
 routeAPI.get("/role-by-id", verifyToken, handleGetActionById);
+routeAPI.get("/action-view", verifyToken, handleGetActionView);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
