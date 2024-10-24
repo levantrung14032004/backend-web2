@@ -381,14 +381,16 @@ export const getCouponUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {
       const [coupon_for_user] = await connection.query(
-        "select * from coupon_for_user where id_user = ?",
+        `select c.coupon_code, c.discount_value, c.created_date, c.expiration_date, c.value_apply
+      from coupon_for_user cf 
+      join coupon c on c.id = cf.id_coupon 
+      where id_user = ? and status = 1 and c.expiration_date > NOW()`,
         [id]
       );
-      const [result, other] = await connection.query("select * from coupon");
-      if (result) {
+      if (coupon_for_user.length > 0) {
         resolve({
-          id: coupon_for_user[0] ? coupon_for_user[0].id : null,
-          coupons: [...result, ...coupon_for_user],
+          id: coupon_for_user[0].id,
+          coupons: coupon_for_user,
         });
       } else {
         resolve(null);
@@ -398,3 +400,20 @@ export const getCouponUser = (id) =>
       reject(error);
     }
   });
+
+export const checkValidCoupon = async (id, coupon, value_apply) => {
+  try {
+    const [result] =
+      await connection.execute(`select c.discount_value from coupon_for_user cf join coupon c on cf.id_coupon = c.id
+where cf.id_user = ${id} and c.coupon_code = "${coupon}" and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ${value_apply}`);
+
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};

@@ -74,12 +74,10 @@ export const changeInfo = async (req, res) => {
     let newPassword = req.body.newPassword;
     let repeatPassword = req.body.repeatPassword;
     if (!firstName || !lastName || !fullName) {
-      return res
-        .status(400)
-        .json({
-          error: 1,
-          message: "First name, last name, display name là bắt buộc",
-        });
+      return res.status(400).json({
+        error: 1,
+        message: "First name, last name, display name là bắt buộc",
+      });
     }
     let rgName =
       /^(?!\s*$)[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/;
@@ -88,13 +86,11 @@ export const changeInfo = async (req, res) => {
       !rgName.test(firstName) ||
       !rgName.test(lastName)
     ) {
-      return res
-        .status(400)
-        .json({
-          error: 1,
-          message:
-            "First name, last name, display name không được có kí tự đặc biệt",
-        });
+      return res.status(400).json({
+        error: 1,
+        message:
+          "First name, last name, display name không được có kí tự đặc biệt",
+      });
     }
     if (password || newPassword || repeatPassword) {
       if (!password || !newPassword || !repeatPassword) {
@@ -104,13 +100,11 @@ export const changeInfo = async (req, res) => {
       }
       let rgPass = /^(?=.*[A-Z]).{8,}$/;
       if (!rgPass.test(newPassword)) {
-        return res
-          .status(400)
-          .json({
-            error: 1,
-            message:
-              "Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất 1 ký tự viết hoa",
-          });
+        return res.status(400).json({
+          error: 1,
+          message:
+            "Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất 1 ký tự viết hoa",
+        });
       }
       if (newPassword !== repeatPassword) {
         return res
@@ -274,10 +268,30 @@ export const handleGetCouponUser = async (req, res) => {
     if (result) {
       return res.status(200).json(result);
     } else {
-       return res.status(501).json("Khong lay duoc coupon");
+      return res.status(501).json("Khong lay duoc coupon");
     }
   } catch (error) {
     console.log(error);
     return res.status(500).error(error);
+  }
+};
+
+export const handleCheckCoupon = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const coupon = req.body.coupon;
+    const value_apply = req.body.value_apply;
+    const result = await userService.checkValidCoupon(id, coupon, value_apply);
+    if (result.length > 0) {
+      res.status(200).json(result);
+    } else {
+      res.status(200).json({
+        message:
+          "Mã giảm giá đã hết hạn hoặc chưa đạt đến hạn mức áp dụng. Vui lòng kiểm tra lại!!!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error);
   }
 };

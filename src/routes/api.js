@@ -80,6 +80,7 @@ routeAPI.get("/user/address", handleGetAddressById);
 routeAPI.post("/user/add-address", userController.handleAddAddress);
 routeAPI.delete("/user/delete-address", userController.handleDeleteAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
+routeAPI.post("/user/check-coupon", userController.handleCheckCoupon);
 
 routeAPI.post("/user/add_order", handleAddOrder);
 
