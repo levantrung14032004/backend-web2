@@ -323,20 +323,42 @@ export const changeInfo = (
 export const getAddressById = async (id) => {
   try {
     const [result, other] = await connection.execute(
-      `select * from addressDetail where id_user = ${id}`
+      `select * from addressDetail where id_user = ?`,
+      [id]
     );
     if (result) {
       const addressFormat = result.reduce((acc, cur) => {
         const existId = acc.find((item) => item.id === cur.id_user);
         if (existId) {
           existId.addressList.push({
-            address: cur.address,
+            id: cur.id,
+            firstName: cur.firstName,
+            lastName: cur.lastName,
+            phoneNumber: cur.phone_number,
+            email: cur.email,
+            province: cur.province,
+            district: cur.district,
+            ward: cur.ward,
+            detail: cur.detail,
             default: cur.setdefault,
           });
         } else {
           acc.push({
             id: cur.id_user,
-            addressList: [{ address: cur.address, default: cur.setdefault }],
+            addressList: [
+              {
+                id: cur.id,
+                firstName: cur.firstName,
+                lastName: cur.lastName,
+                phoneNumber: cur.phone_number,
+                email: cur.email,
+                province: cur.province,
+                district: cur.district,
+                ward: cur.ward,
+                detail: cur.detail,
+                default: cur.setdefault,
+              },
+            ],
           });
         }
         return acc;
@@ -351,18 +373,49 @@ export const getAddressById = async (id) => {
   }
 };
 
-export const addAddress = async (id, address, defaultAddress) => {
-  try {
-    await connection.execute(
-      `INSERT INTO addressDetail (id_user, address, setdefault) VALUES (?, ?, ?)`,
-      [id, address, defaultAddress]
-    );
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
+export const addAddress = (
+  id,
+  phone_number,
+  email,
+  firstName,
+  lastName,
+  province,
+  district,
+  ward,
+  detail
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const result = await connection.execute(
+        "INSERT INTO addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          phone_number,
+          email,
+          firstName,
+          lastName,
+          province,
+          district,
+          ward,
+          detail,
+          1,
+        ]
+      );
+      resolve({
+        error: result[0].affectedRows === 1 ? 0 : 1,
+        message:
+          result[0].affectedRows === 1
+            ? "Thêm địa chỉ thành công"
+            : "Thêm địa chỉ thất bại",
+      });
+    } catch (error) {
+      console.error(error);
+      reject({
+        error: 1,
+        message: "Thêm địa chỉ thất bại",
+      });
+    }
+  });
 
 export const deleteAddress = async (id, address) => {
   try {
