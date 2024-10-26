@@ -227,7 +227,19 @@ export const handleGetAddressById = async (req, res) => {
     res.status(402).error(error);
   }
 };
-
+export const handleSelectAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const id_address = req.body.id_address;
+    if (!id_address)
+      return res.status(400).json({ error: 1, message: "Missing id_address" });
+    const result = await userService.selectAddress(id, id_address);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(402).error(error);
+  }
+};
 export const handleAddAddress = async (req, res) => {
   try {
     const id = req.data.id;

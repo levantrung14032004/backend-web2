@@ -257,8 +257,9 @@ export const changeInfo = (
   new_password
 ) =>
   new Promise(async (resolve, reject) => {
+    let client;
     try {
-      const client = await connection.getConnection();
+      client = await connection.getConnection();
       await client.beginTransaction();
       const [names] = await client.execute(
         "update user set first_name = ?, last_name = ?, fullname = ? where id = ?",
@@ -318,6 +319,8 @@ export const changeInfo = (
     } catch (error) {
       console.log(error);
       reject(error);
+    } finally {
+      if (client) client.release();
     }
   });
 export const getAddressById = async (id) => {
@@ -372,7 +375,52 @@ export const getAddressById = async (id) => {
     return null;
   }
 };
+export const selectAddress = (id_user, id) =>
+  new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [result] = await client.execute(
+        `update addressDetail set setdefault = 0 where id_user = ?`,
+        [id_user]
+      );
+      if (result.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Chọn địa chỉ mặc định thất bại",
+        });
+        return;
+      }
+      const [result2] = await client.execute(
+        `update addressDetail set setdefault = 1 where id = ?`,
+        [id]
+      );
+      if (result2.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Chọn địa chỉ mặc định thất bại",
+        });
+        return;
+      }
+      await client.commit();
 
+      resolve({
+        error: 0,
+        message: "Chọn địa chỉ mặc định thành công",
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: "Chọn địa chỉ mặc định thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
 export const addAddress = (
   id,
   phone_number,
