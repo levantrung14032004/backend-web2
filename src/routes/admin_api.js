@@ -35,6 +35,8 @@ import { handleGetGoodsReceived } from "../controllers/received.js";
 import {
   handleGetActionById,
   handleGetActionView,
+  handleGetAllPermission,
+  handleGetCurrentAction,
   handleGetPermissions,
   handleGetRole,
   handleSetPermission,
@@ -71,11 +73,13 @@ routeAPI.get("/employee-current", handleGetCurentEmployee);
 routeAPI.put("/employee", verifyToken, handleDeleteEmployee);
 
 // Permission
-routeAPI.get("/permissions", verifyToken, handleGetPermissions);
 routeAPI.get("/role", handleGetRole);
+routeAPI.get("/permissions", handleGetPermissions);
+routeAPI.get("/all-permissions", handleGetAllPermission);
 routeAPI.put("/role-change", verifyToken, handleSetPermission);
 routeAPI.get("/role-by-id", verifyToken, handleGetActionById);
 routeAPI.get("/action-view", verifyToken, handleGetActionView);
+routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
@@ -111,9 +115,9 @@ routeAPI.put("/user/info", verifyToken, handleEditInfoById);
 routeAPI.post("/user/add_order", handleAddOrder);
 
 // Admin Order
-routeAPI.post("/order/totalDate", handleGetTotalWithDate);
-routeAPI.get("/order/top-selling", handleGetTopSelling);
-routeAPI.post("/order/date-to-date", handleGetDashDtoD);
+routeAPI.post("/order/totalDate", verifyToken, handleGetTotalWithDate);
+routeAPI.get("/order/top-selling", verifyToken, handleGetTopSelling);
+routeAPI.post("/order/date-to-date", verifyToken, handleGetDashDtoD);
 
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);
