@@ -228,21 +228,63 @@ export const handleGetAddressById = async (req, res) => {
     res.status(402).error(error);
   }
 };
-
+export const handleSelectAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const id_address = req.body.id_address;
+    if (!id_address)
+      return res.status(400).json({ error: 1, message: "Missing id_address" });
+    const result = await userService.selectAddress(id, id_address);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(402).error(error);
+  }
+};
 export const handleAddAddress = async (req, res) => {
   try {
     const id = req.data.id;
-    const address = req.body.address;
-    const setdefault = req.body.setdefault;
-    const result = await userService.addAddress(id, address, setdefault);
-    if (result) {
-      res.status(200).json(result);
-    } else {
-      res.status(501).json("Khong them duoc dia chi");
+    const {
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail,
+    } = req.body;
+    if (
+      !id ||
+      !phone_number ||
+      !email ||
+      !firstName ||
+      !lastName ||
+      !province ||
+      !district ||
+      !ward ||
+      !detail
+    ) {
+      return res.status(400).json({
+        error: 1,
+        message: "Missing information",
+      });
     }
+    const result = await userService.addAddress(
+      id,
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail
+    );
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    res.status(402).error(error);
+    res.status(500).error(error);
   }
 };
 

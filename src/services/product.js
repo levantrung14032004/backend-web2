@@ -61,8 +61,9 @@ export const addProduct = (
   description
 ) =>
   new Promise(async (resolve, reject) => {
+    let client;
     try {
-      const client = await connection.getConnection();
+      client = await connection.getConnection();
       const [result, fields] = await client.execute(
         "INSERT INTO product(author_id, title, thumbnail, description,created_at,update_at, status) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)",
         [author_id, title, url_img, description]
@@ -102,6 +103,8 @@ export const addProduct = (
         error: 1,
         message: error,
       });
+    } finally {
+      if (client) client.release();
     }
   });
 
