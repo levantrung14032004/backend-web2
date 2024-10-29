@@ -137,6 +137,7 @@ const handleAddOrder = async (req, res) => {
     let email = req.body.email;
     let note = req.body.note;
     let shipFee = req.body.shipFee;
+    let discount = req.body.discount;
     let total = req.body.total;
     let employeeId = req.body.employeeId;
     let products = req.body.products;

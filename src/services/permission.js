@@ -1,19 +1,31 @@
 import connection from "../database/database.js";
 
-const getPermissions = async () => {
-  const [values, field] = await connection.execute(
-    "select r.id, r.name, rd.action_code, rd.check_action from role as r join role_detail as rd on r.id = rd.role_id"
-  );
+const getAllPermission = async () => {
+  const [values, field] = await connection.execute("select * from permissions");
   if (values) return values;
   return null;
 };
+const checkAndInsertPermission = async (role_id, permission_id) => {
+  try {
+    const [rows] = await connection.execute(
+      `SELECT * FROM role_permissions WHERE role_id = ? AND permission_id = ?`,
+      [role_id, permission_id]
+    );
 
-const getRole = async () => {
-  const [values, field] = await connection.execute(
-    "select * from role where role.id = 3 or role.id = 4 or role.id = 7"
-  );
-  if (values) return values;
-  return null;
+    if (rows.length === 0) {
+      await connection.execute(
+        `INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)`,
+        [role_id, permission_id]
+      );
+    } else {
+      await connection.execute(
+        `DELETE FROM role_permissions WHERE role_id = ? AND permission_id = ?`,
+        [role_id, permission_id]
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const setPermision = async (id, code, value) => {
@@ -26,6 +38,14 @@ const setPermision = async (id, code, value) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const getRole = async () => {
+  const [values, field] = await connection.execute(
+    "select * from role where id=2 or id=3 or id=4 or id=7"
+  );
+  if (values) return values;
+  return null;
 };
 
 const getActionById = async (id) => {
@@ -52,4 +72,32 @@ const getActionView = async (id) => {
   return null;
 };
 
-export { getPermissions, getRole, setPermision, getActionById, getActionView };
+const getPermissions = async () => {
+  const [values, field] = await connection.execute(
+    `SELECT rp.role_id,role.name,rp.permission_id, p.entity, p.action
+      FROM role_permissions rp
+      JOIN permissions p ON rp.permission_id = p.id
+      join role on rp.role_id = role.id`
+  );
+  if (values) return values;
+  return null;
+};
+
+const currentAction = async (role_id) => {
+  const [values, field] = await connection.execute(
+    `select p.entity, p.action from role_permissions rp join permissions p on rp.permission_id = p.id where rp.role_id = ${role_id} `
+  );
+  if (values) return values;
+  return null;
+};
+
+export {
+  getPermissions,
+  getAllPermission,
+  setPermision,
+  getActionById,
+  getActionView,
+  getRole,
+  checkAndInsertPermission,
+  currentAction,
+};

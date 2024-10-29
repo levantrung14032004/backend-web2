@@ -116,13 +116,14 @@ const addOrder = async (
   email,
   note,
   shipFee,
+  discount,
   total,
   employeeId,
   products
 ) => {
   try {
     await connection.execute(
-      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),2)`,
+      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,discount, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ?, NOW(),2)`,
       [
         user_id,
         employeeId,
@@ -132,6 +133,7 @@ const addOrder = async (
         address,
         note,
         shipFee,
+        discount,
         total,
       ]
     );
