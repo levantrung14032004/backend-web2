@@ -477,7 +477,48 @@ export const deleteAddress = async (id, address) => {
     return false;
   }
 };
-
+export const editAddress = (
+  id,
+  phone_number,
+  email,
+  firstName,
+  lastName,
+  province,
+  district,
+  ward,
+  detail
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const result = await connection.execute(
+        `UPDATE addressDetail SET phone_number = ?, email = ?, firstName = ?, lastName = ?, province = ?, district = ?, ward = ?, detail = ? WHERE id = ?`,
+        [
+          phone_number,
+          email,
+          firstName,
+          lastName,
+          province,
+          district,
+          ward,
+          detail,
+          id,
+        ]
+      );
+      resolve({
+        error: result[0].affectedRows === 1 ? 0 : 1,
+        message:
+          result[0].affectedRows === 1
+            ? "Cập nhật địa chỉ thành công"
+            : "Cập nhật địa chỉ thất bại",
+      });
+    } catch (error) {
+      console.error(error);
+      reject({
+        error: 1,
+        message: "Cập nhật địa chỉ thất bại",
+      });
+    }
+  });
 export const getCouponUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {

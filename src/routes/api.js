@@ -77,7 +77,7 @@ routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info/edit", userController.changeInfo);
 routeAPI.get("/user/order", order.getOrderByUser);
 routeAPI.get("/user/address", handleGetAddressById);
-routeAPI.put("/user/address/select", userController.handleSelectAddress);  
+routeAPI.put("/user/address/select", userController.handleSelectAddress);
 routeAPI.post("/user/add-address", userController.handleAddAddress);
 routeAPI.delete("/user/delete-address", userController.handleDeleteAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
