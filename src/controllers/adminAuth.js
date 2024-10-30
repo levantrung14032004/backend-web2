@@ -7,7 +7,6 @@ import {
   updateRefreshToken,
   deleteRefreshToken,
 } from "../services/adminAuth.js";
-import { getActionById } from "../services/permission.js";
 
 const generateAccessToken = (employee) => {
   return jwt.sign(employee, process.env.ACCESS_KEY, {
@@ -67,8 +66,7 @@ const handleLoginEmployee = async (req, res) => {
         return;
       }
       if (employee && validPassword) {
-        const actionRole = await getActionById(employee[0].role_id);
-        const employeeAction = { ...employee[0], actionRole };
+        const employeeAction = { ...employee[0] };
         const accessToken = generateAccessToken(employeeAction);
         const refreshToken = generateRefreshToken(employeeAction);
         res.cookie("refreshToken", refreshToken, { httpOnly: true });

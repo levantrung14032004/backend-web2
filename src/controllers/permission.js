@@ -1,8 +1,6 @@
 import {
   getPermissions,
   getAllPermission,
-  setPermision,
-  getActionById,
   getActionView,
   getRole,
   checkAndInsertPermission,

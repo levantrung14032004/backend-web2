@@ -48,16 +48,6 @@ const getRole = async () => {
   return null;
 };
 
-const getActionById = async (id) => {
-  const [values, field] = await connection.execute(
-    `select action_code, check_action from role_detail where role_id = ${id}`
-  );
-  if (values) {
-    return values;
-  }
-  return null;
-};
-
 const getActionView = async (id) => {
   const [values, field] = await connection.execute(
     `select rp.role_id, p.entity,p.action from role_permissions rp join permissions p 
@@ -95,7 +85,6 @@ export {
   getPermissions,
   getAllPermission,
   setPermision,
-  getActionById,
   getActionView,
   getRole,
   checkAndInsertPermission,
