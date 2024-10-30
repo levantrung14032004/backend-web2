@@ -6,7 +6,7 @@ import {
   addOrder,
 } from "../services/user.js";
 import * as userService from "../services/user.js";
-
+import * as regex from "../utils/regex.js";
 const handleGetAllUsers = async (req, res) => {
   try {
     const result = await getUsers();
@@ -287,7 +287,78 @@ export const handleAddAddress = async (req, res) => {
     res.status(500).error(error);
   }
 };
-
+export const handleEditAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const {
+      id_address,
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail,
+    } = req.body;
+    if (
+      !id_address ||
+      !phone_number ||
+      !email ||
+      !firstName ||
+      !lastName ||
+      !province ||
+      !district ||
+      !ward ||
+      !detail
+    ) {
+      return res.status(400).json({
+        error: 1,
+        message: "Thiếu thông tin",
+      });
+    }
+    if (!regex.rgPhone.test(phone_number)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Số điện thoại không hợp lệ",
+      });
+    }
+    if (!regex.rgEmail.test(email)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Email không hợp lệ",
+      });
+    }
+    if (!regex.rgName.test(firstName) || !regex.rgName.test(lastName)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Tên không hợp lệ",
+      });
+    }
+    if (!regex.rgAddress.test(detail)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Địa chỉ không hợp lệ",
+      });
+    }
+    const result = await userService.editAddress(
+      id,
+      id_address,
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail
+    );
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error);
+  }
+};
 export const handleDeleteAddress = async (req, res) => {
   try {
     const id = req.data.id;

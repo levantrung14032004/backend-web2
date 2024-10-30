@@ -1,7 +1,7 @@
 import database from "../database/database.js";
 import bcrypt from "bcrypt";
 import { sendCode } from "../utils/sendmail.js";
-let verificationCodes= {};
+let verificationCodes = {};
 const saltRounds = 10;
 const hashPassword = (password) => {
   return bcrypt.hashSync(password, saltRounds);
@@ -36,21 +36,48 @@ export const login = (email, password) =>
   });
 export const register = (email, password) =>
   new Promise(async (resolve, reject) => {
+    let client;
     try {
-      const [result, fields] = await database.execute(
+      client = await database.getConnection();
+      await client.beginTransaction();
+      const [result, fields] = await client.execute(
         "INSERT into user (role_id,email,password,status) SELECT 1, ?, ?, 1 WHERE not EXISTS( SELECT * FROM user WHERE email = ? )",
         [email, hashPassword(password), email]
       );
+      if (result.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Email đã tồn tại",
+        });
+        await client.rollback();
+        return;
+      }
+      const id_coupon_for_new_user = 4;
+      const [addCoupon] = await client.execute(
+        "INSERT INTO coupon_for_user (id_user, id_coupon, status) VALUES (?, ?, ?)",
+        [result.insertId, id_coupon_for_new_user, 1]
+      );
+      if (addCoupon.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Thêm coupon thất bại",
+        });
+        await client.rollback();
+        return;
+      }
       resolve({
-        error: result.affectedRows === 0 ? 1 : 0,
-        message:
-          result.affectedRows === 0
-            ? "Email đã tồn tại"
-            : "Đăng ký thành công",
+        error: 0,
+        message: "Đăng ký thành công",
       });
+      await client.commit();
     } catch (err) {
       console.log(err);
-      reject(err);
+      reject({
+        error: 1,
+        message: "Đăng ký thất bại",
+      });
+    } finally {
+      if (client) client.release();
     }
   });
 export const logout = (id) =>
@@ -100,16 +127,16 @@ export const send_Code_Register = (email) =>
       reject(error);
     }
   });
-  export const verify_Code_Register = (email, code) => {
-    if (verificationCodes[email] === code) {
-      delete verificationCodes[email];
-      return {
-        error: 0,
-        message: "Code xác nhận đúng",
-      };
-    }
+export const verify_Code_Register = (email, code) => {
+  if (verificationCodes[email] === code) {
+    delete verificationCodes[email];
     return {
-      error: 1,
-      message: "Code xác nhận không đúng",
+      error: 0,
+      message: "Code xác nhận đúng",
     };
   }
+  return {
+    error: 1,
+    message: "Code xác nhận không đúng",
+  };
+};
