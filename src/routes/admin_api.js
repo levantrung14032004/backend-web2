@@ -59,7 +59,6 @@ import {
 } from "../controllers/adminAuth.js";
 
 import { verifyToken } from "../middleware/jwt_admin.js";
-import { getActionById } from "../services/permission.js";
 const routeAPI = express.Router();
 // Auth
 routeAPI.post("/auth/register", handleRegisterEmployee);
@@ -77,7 +76,6 @@ routeAPI.get("/role", handleGetRole);
 routeAPI.get("/permissions", handleGetPermissions);
 routeAPI.get("/all-permissions", handleGetAllPermission);
 routeAPI.put("/role-change", verifyToken, handleSetPermission);
-routeAPI.get("/role-by-id", verifyToken, handleGetActionById);
 routeAPI.get("/action-view", verifyToken, handleGetActionView);
 routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 
