@@ -342,8 +342,8 @@ export const handleEditAddress = async (req, res) => {
       });
     }
     const result = await userService.editAddress(
-      id,
       id_address,
+      id,
       phone_number,
       email,
       firstName,
