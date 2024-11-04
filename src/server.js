@@ -92,7 +92,7 @@ app.use("/static", express.static("public"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
-app.use("/", router);
+// app.use("/", router);
 app.use("/api/v2", routerAdmin);
 app.use("/api", routerAPI);
 app.use("/auth", routerAuth);

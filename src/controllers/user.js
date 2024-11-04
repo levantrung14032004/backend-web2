@@ -238,7 +238,7 @@ export const handleSelectAddress = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    return res.status(402).error(error);
+    return res.status(500).error(error);
   }
 };
 export const handleAddAddress = async (req, res) => {
@@ -362,16 +362,14 @@ export const handleEditAddress = async (req, res) => {
 export const handleDeleteAddress = async (req, res) => {
   try {
     const id = req.data.id;
-    const address = req.body.address;
-    const result = await userService.deleteAddress(id, address);
-    if (result) {
-      res.status(200).json("Xoa dia chi thanh cong");
-    } else {
-      res.status(501).json("Xoa dia chi that bai");
-    }
+    const id_address = req.params.id_address;
+    if (!id || !id_address)
+      return res.status(400).json({ error: 1, message: "Thiếu thông tin" });
+    const response = await userService.deleteAddress(parseInt(id_address), id);
+    return res.status(200).json(response);
   } catch (error) {
     console.log(error);
-    res.status(402).error(error);
+    res.status(500).json(error);
   }
 };
 

@@ -72,6 +72,7 @@ export const register = (email, password) =>
       await client.commit();
     } catch (err) {
       console.log(err);
+      await client.rollback();
       reject({
         error: 1,
         message: "Đăng ký thất bại",
