@@ -15,6 +15,52 @@ export const getOrderByUser = async (req, res) => {
   }
 };
 
+export const handleGetOrderByAdmin = async (req, res) => {
+  try {
+    const orders = await orderService.getOrderByAdmin();
+    if (orders) {
+      const result = orders.reduce((acc, order) => {
+        const found = acc.find((item) => item.id === order.id);
+        if (!found) {
+          acc.push({
+            orderId: order.id,
+            orderDate: order.order_date,
+            status: order.status,
+            total: order.total_money,
+            employeeId: order.employee_id,
+            shipFee: order.shipFee,
+            note: order.note,
+            products: [
+              {
+                productName: order.title,
+                thumbnail: order.thumbnail,
+                unitPrice: order.price,
+                quantity: order.num,
+              },
+            ],
+          });
+        } else {
+          found.products.push({
+            productName: order.title,
+            thumbnail: order.thumbnail,
+            unitPrice: order.price,
+            quantity: order.num,
+          });
+        }
+        return acc;
+      }, []);
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({
+        error: 1,
+        message: "No data found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
 export const handleCreateOrder = (req, res) => {
   const values = req.body;
   console.log(values);
@@ -59,6 +105,42 @@ export const handleGetDashDtoD = async (req, res) => {
       const totalValues = await orderService.getDashDtoD(startDate, endDate);
       res.status(200).json(totalValues);
     }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetOrderStatus = async (req, res) => {
+  try {
+    const status = await orderService.getOrderStatus();
+    res.status(200).json(status);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetTotal1D = async (req, res) => {
+  try {
+    const total = await orderService.getRevenueAndOrderOne();
+    res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetTotal3D = async (req, res) => {
+  try {
+    const total = await orderService.getRevenueAndOrderThree();
+    res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetTotal7D = async (req, res) => {
+  try {
+    const total = await orderService.getRevenueAndOrderSeven();
+    res.status(200).json(total);
   } catch (error) {
     res.status(500).json(error);
   }

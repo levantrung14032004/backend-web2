@@ -28,6 +28,7 @@ import {
   handleGetCurentEmployee,
   handleGetEmployee,
   handleDeleteEmployee,
+  handleEditEmployee,
 } from "../controllers/employee.js";
 
 import { handleGetGoodsReceived } from "../controllers/received.js";
@@ -49,7 +50,12 @@ import * as category from "../controllers/category.js";
 import upload from "../middleware/multer.js";
 import {
   handleGetDashDtoD,
+  handleGetOrderByAdmin,
+  handleGetOrderStatus,
   handleGetTopSelling,
+  handleGetTotal1D,
+  handleGetTotal3D,
+  handleGetTotal7D,
   handleGetTotalWithDate,
 } from "../controllers/order.js";
 import {
@@ -68,7 +74,8 @@ routeAPI.post("/auth/logout", verifyToken, handleLogOut);
 // Employee
 routeAPI.get("/employee", verifyToken, handleGetEmployee);
 routeAPI.post("/employee", verifyToken, handleCreateEmployee);
-routeAPI.get("/employee-current", handleGetCurentEmployee);
+routeAPI.get("/employee-current", verifyToken, handleGetCurentEmployee);
+routeAPI.post("/edit-employee", verifyToken, handleEditEmployee);
 routeAPI.put("/employee", verifyToken, handleDeleteEmployee);
 
 // Permission
@@ -92,7 +99,6 @@ routeAPI.post(
 
 //Category
 routeAPI.get("/category", category.getAllCategory);
-// routeAPI.get("/category", category.getCategoryById);
 routeAPI.get("/all-category", category.getAllCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
@@ -116,6 +122,11 @@ routeAPI.post("/user/add_order", handleAddOrder);
 routeAPI.post("/order/totalDate", verifyToken, handleGetTotalWithDate);
 routeAPI.get("/order/top-selling", verifyToken, handleGetTopSelling);
 routeAPI.post("/order/date-to-date", verifyToken, handleGetDashDtoD);
+routeAPI.get("/order/get-all-order-admin", verifyToken, handleGetOrderByAdmin);
+routeAPI.get("/order/get-order-status", verifyToken, handleGetOrderStatus);
+routeAPI.get("/order/get-total-1d", verifyToken, handleGetTotal1D);
+routeAPI.get("/order/get-total-3d", verifyToken, handleGetTotal3D);
+routeAPI.get("/order/get-total-7d", verifyToken, handleGetTotal7D);
 
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);

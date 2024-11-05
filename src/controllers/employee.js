@@ -3,6 +3,7 @@ import {
   createEmployee,
   getCurrentEmployee,
   deleteCurrentEmployee,
+  editCurrentEmployee,
 } from "../services/employee.js";
 
 const handleGetEmployee = async (req, res) => {
@@ -64,9 +65,25 @@ const handleDeleteEmployee = async (req, res) => {
   }
 };
 
+const handleEditEmployee = async (req, res) => {
+  try {
+    const value = req.body.value;
+    const result = await editCurrentEmployee(value);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(504).error("Co loi khi tao nhan vien");
+    }
+  } catch (error) {
+    console.error(error);
+    res.json(error);
+  }
+};
+
 export {
   handleGetEmployee,
   handleCreateEmployee,
   handleGetCurentEmployee,
   handleDeleteEmployee,
+  handleEditEmployee,
 };

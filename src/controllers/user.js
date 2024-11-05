@@ -150,10 +150,12 @@ const handleAddOrder = async (req, res) => {
       email,
       note,
       shipFee,
+      discount,
       total,
       employeeId,
       products
     );
+    console.log(result);
 
     if (result) {
       res.status(200).json({

@@ -21,10 +21,28 @@ export const getOrderByUser = (id) =>
     }
   });
 
+export const getOrderByAdmin = async () => {
+  try {
+    const [values, fields] =
+      await connection.execute(`SELECT o.id, p.title, od.num, od.price, o.total_money, o.order_date, o.status, o.employee_id, p.thumbnail, o.shipFee, o.note
+        FROM ${process.env.DATABASE_NAME}.order o
+        JOIN ${process.env.DATABASE_NAME}.order_detail od ON o.id = od.order_id
+        JOIN ${process.env.DATABASE_NAME}.product p ON p.id = od.product_id`);
+    if (values) {
+      return values;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 export const getTotalWithDate = async (date) => {
   try {
     const [rows, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM myweb.order WHERE DATE(order_date) = ?`,
+      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = ?`,
       [date]
     );
     return rows[0];
@@ -56,12 +74,12 @@ LIMIT 6`
 export const getDashDtoD = async (startDate, endDate) => {
   try {
     const [totalValues, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM myweb.order WHERE DATE(order_date) BETWEEN ? AND ?`,
+      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) BETWEEN ? AND ?`,
       [startDate, endDate]
     );
 
     const [totalOrders, fields2] = await connection.execute(
-      `SELECT COUNT(*) AS total_orders FROM myweb.order WHERE DATE(order_date) BETWEEN ? AND ?`,
+      `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) BETWEEN ? AND ?`,
       [startDate, endDate]
     );
     if (totalValues && totalOrders) {
@@ -70,6 +88,75 @@ export const getDashDtoD = async (startDate, endDate) => {
         total_orders: totalOrders[0].total_orders,
       };
     }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getOrderStatus = async () => {
+  try {
+    const [rows, fields] = await connection.execute(
+      `SELECT id, name FROM ${process.env.DATABASE_NAME}.orderstatus`
+    );
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getRevenueAndOrderOne = async () => {
+  try {
+    const [revenue, fields] = await connection.execute(
+      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = CURDATE()`
+    );
+    const [order, fields2] = await connection.execute(
+      `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = CURDATE()`
+    );
+    return {
+      success: true,
+      total_revenue: revenue[0].total_revenue,
+      total_orders: order[0].total_orders,
+    };
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getRevenueAndOrderThree = async () => {
+  try {
+    const [revenue, fields] = await connection.execute(
+      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
+    );
+    const [order, fields2] = await connection.execute(
+      `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
+    );
+    return {
+      success: true,
+      total_revenue: revenue[0].total_revenue,
+      total_orders: order[0].total_orders,
+    };
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getRevenueAndOrderSeven = async () => {
+  try {
+    const [revenue, fields] = await connection.execute(
+      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`
+    );
+    const [order, fields2] = await connection.execute(
+      `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`
+    );
+    return {
+      success: true,
+      total_revenue: revenue[0].total_revenue,
+      total_orders: order[0].total_orders,
+    };
   } catch (error) {
     console.log(error);
     return null;

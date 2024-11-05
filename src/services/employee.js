@@ -69,9 +69,33 @@ const deleteCurrentEmployee = async (id) => {
   }
 };
 
+const editCurrentEmployee = async (value) => {
+  try {
+    const [result, other] = await connection.execute(
+      `update employee set role_id = ?, fullname = ?, password = ?, phone_number = ?, address = ? where id = ?`,
+      [
+        parseInt(value.role),
+        value.fullname,
+        value.password,
+        "0" + value.phone_number,
+        value.address,
+        value.id,
+      ]
+    );
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   getEmployee,
   createEmployee,
   getCurrentEmployee,
   deleteCurrentEmployee,
+  editCurrentEmployee,
 };
