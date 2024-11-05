@@ -320,6 +320,7 @@ export const changeInfo = (
       });
     } catch (error) {
       console.log(error);
+      await client.rollback();
       reject(error);
     } finally {
       if (client) client.release();
@@ -383,21 +384,35 @@ export const selectAddress = (id_user, id) =>
     try {
       client = await connection.getConnection();
       await client.beginTransaction();
-      const [result] = await client.execute(
-        `update addressDetail set setdefault = 0 where id_user = ?`,
+      const [list_address] = await client.query(
+        "select * from addressDetail where id_user = ? ",
         [id_user]
       );
-      if (result.affectedRows === 0) {
+      if (list_address.length === 0) {
         await client.rollback();
         resolve({
           error: 1,
-          message: "Chọn địa chỉ mặc định thất bại",
+          message: "Chọn địa chỉ thất bại",
         });
         return;
       }
+      if (list_address.length > 1) {
+        const [result] = await client.execute(
+          `update addressDetail set setdefault = 0 where id_user = ? and setdefault = 1`,
+          [id_user]
+        );
+        if (result.affectedRows === 0) {
+          await client.rollback();
+          resolve({
+            error: 1,
+            message: "Chọn địa chỉ mặc định thất bại",
+          });
+          return;
+        }
+      }
       const [result2] = await client.execute(
-        `update addressDetail set setdefault = 1 where id = ?`,
-        [id]
+        `update addressDetail set setdefault = 1 where id = ? and id_user = ? `,
+        [id, id_user]
       );
       if (result2.affectedRows === 0) {
         await client.rollback();
@@ -408,13 +423,13 @@ export const selectAddress = (id_user, id) =>
         return;
       }
       await client.commit();
-
       resolve({
         error: 0,
         message: "Chọn địa chỉ mặc định thành công",
       });
     } catch (error) {
       console.log(error);
+      await client.rollback();
       reject({
         error: 1,
         message: "Chọn địa chỉ mặc định thất bại",
@@ -435,11 +450,151 @@ export const addAddress = (
   detail
 ) =>
   new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [list_address] = await client.query(
+        "select * from addressDetail where id_user = ? ",
+        [id]
+      );
+      const sql =
+        list_address.length === 0
+          ? "insert into addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail, setdefault) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+          : "insert into addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      const arr =
+        list_address.length === 0
+          ? [
+              id,
+              phone_number,
+              email,
+              firstName,
+              lastName,
+              province,
+              district,
+              ward,
+              detail,
+              1,
+            ]
+          : [
+              id,
+              phone_number,
+              email,
+              firstName,
+              lastName,
+              province,
+              district,
+              ward,
+              detail,
+            ];
+      const result = await client.execute(sql, arr);
+      if (result[0].affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Thêm địa chỉ thất bại",
+        });
+        return;
+      }
+      await client.commit();
+      resolve({
+        error: 0,
+        message: "Thêm địa chỉ thành công",
+      });
+    } catch (error) {
+      console.error(error);
+      await client.rollback();
+      reject({
+        error: 1,
+        message: "Thêm địa chỉ thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
+
+export const deleteAddress = (id, id_user) =>
+  new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [address] = await client.query(
+        `select * from addressDetail where id = ? and id_user = ?`,
+        [id, id_user]
+      );
+      if (address.length === 0) {
+        resolve({
+          error: 1,
+          message: "Xóa địa chỉ thất bại",
+        });
+        return;
+      }
+      const [result] = await client.execute(
+        `DELETE FROM addressDetail WHERE id = ? and id_user= ?`,
+        [id, id_user]
+      );
+      if (result.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Xóa địa chỉ thất bại",
+        });
+        return;
+      }
+      if (address[0].setdefault === "1") {
+        const [count] = await client.query(
+          `select count(*) as count from addressDetail where id_user = ?`,
+          [id_user]
+        );
+        if (count[0].count > 0) {
+          const [setdefault] = await client.execute(
+            `update addressDetail set setdefault = 1 where id_user = ? order by id limit 1`,
+            [id_user]
+          );
+          if (setdefault.affectedRows === 0) {
+            await client.rollback();
+            resolve({
+              error: 1,
+              message: "Xóa địa chỉ thất bại",
+            });
+            return;
+          }
+        }
+      }
+      await client.commit();
+      resolve({
+        error: 0,
+        message: "Xóa địa chỉ thành công",
+      });
+    } catch (error) {
+      console.error(error);
+      await client.rollback();
+      reject({
+        error: 1,
+        message: "Xóa địa chỉ thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
+export const editAddress = (
+  id,
+  id_user,
+  phone_number,
+  email,
+  firstName,
+  lastName,
+  province,
+  district,
+  ward,
+  detail
+) =>
+  new Promise(async (resolve, reject) => {
     try {
       const result = await connection.execute(
-        "INSERT INTO addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        `UPDATE addressDetail SET phone_number = ?, email = ?, firstName = ?, lastName = ?, province = ?, district = ?, ward = ?, detail = ? WHERE id = ? and id_user = ? `,
         [
-          id,
           phone_number,
           email,
           firstName,
@@ -448,38 +603,25 @@ export const addAddress = (
           district,
           ward,
           detail,
-          1,
+          id,
+          id_user,
         ]
       );
       resolve({
         error: result[0].affectedRows === 1 ? 0 : 1,
         message:
           result[0].affectedRows === 1
-            ? "Thêm địa chỉ thành công"
-            : "Thêm địa chỉ thất bại",
+            ? "Cập nhật địa chỉ thành công"
+            : "Cập nhật địa chỉ thất bại",
       });
     } catch (error) {
       console.error(error);
       reject({
         error: 1,
-        message: "Thêm địa chỉ thất bại",
+        message: "Cập nhật địa chỉ thất bại",
       });
     }
   });
-
-export const deleteAddress = async (id, address) => {
-  try {
-    await connection.execute(
-      `DELETE FROM addressDetail WHERE id = ? and address = ?`,
-      [id, address]
-    );
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
-
 export const getCouponUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {

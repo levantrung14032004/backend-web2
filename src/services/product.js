@@ -99,6 +99,7 @@ export const addProduct = (
       });
     } catch (error) {
       console.log(error);
+      await client.rollback();
       reject({
         error: 1,
         message: error,

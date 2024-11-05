@@ -6,7 +6,7 @@ import {
   addOrder,
 } from "../services/user.js";
 import * as userService from "../services/user.js";
-
+import * as regex from "../utils/regex.js";
 const handleGetAllUsers = async (req, res) => {
   try {
     const result = await getUsers();
@@ -240,7 +240,7 @@ export const handleSelectAddress = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    return res.status(402).error(error);
+    return res.status(500).error(error);
   }
 };
 export const handleAddAddress = async (req, res) => {
@@ -289,20 +289,89 @@ export const handleAddAddress = async (req, res) => {
     res.status(500).error(error);
   }
 };
-
+export const handleEditAddress = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const {
+      id_address,
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail,
+    } = req.body;
+    if (
+      !id_address ||
+      !phone_number ||
+      !email ||
+      !firstName ||
+      !lastName ||
+      !province ||
+      !district ||
+      !ward ||
+      !detail
+    ) {
+      return res.status(400).json({
+        error: 1,
+        message: "Thiếu thông tin",
+      });
+    }
+    if (!regex.rgPhone.test(phone_number)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Số điện thoại không hợp lệ",
+      });
+    }
+    if (!regex.rgEmail.test(email)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Email không hợp lệ",
+      });
+    }
+    if (!regex.rgName.test(firstName) || !regex.rgName.test(lastName)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Tên không hợp lệ",
+      });
+    }
+    if (!regex.rgAddress.test(detail)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Địa chỉ không hợp lệ",
+      });
+    }
+    const result = await userService.editAddress(
+      id_address,
+      id,
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail
+    );
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error);
+  }
+};
 export const handleDeleteAddress = async (req, res) => {
   try {
     const id = req.data.id;
-    const address = req.body.address;
-    const result = await userService.deleteAddress(id, address);
-    if (result) {
-      res.status(200).json("Xoa dia chi thanh cong");
-    } else {
-      res.status(501).json("Xoa dia chi that bai");
-    }
+    const id_address = req.params.id_address;
+    if (!id || !id_address)
+      return res.status(400).json({ error: 1, message: "Thiếu thông tin" });
+    const response = await userService.deleteAddress(parseInt(id_address), id);
+    return res.status(200).json(response);
   } catch (error) {
     console.log(error);
-    res.status(402).error(error);
+    res.status(500).json(error);
   }
 };
 

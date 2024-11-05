@@ -47,7 +47,7 @@ routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", handleGetAllProducts);
 routeAPI.get("/search", handleSearchProducts);
-routeAPI.put("/product", handleDeleteProduct); // route này phải để ở admin phải có xác thực mới được xóa sửa lại đi nha
+// routeAPI.put("/product", handleDeleteProduct); // route này phải để ở admin phải có xác thực mới được xóa sửa lại đi nha
 routeAPI.get("/product/mainpage", products.get_products_at_home);
 routeAPI.get("/product/detail", products.get_product_by_id);
 routeAPI.get("/product/limit", products.getProductlimit);
@@ -77,9 +77,10 @@ routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info/edit", userController.changeInfo);
 routeAPI.get("/user/order", order.getOrderByUser);
 routeAPI.get("/user/address", handleGetAddressById);
-routeAPI.put("/user/address/select", userController.handleSelectAddress);  
-routeAPI.post("/user/add-address", userController.handleAddAddress);
-routeAPI.delete("/user/delete-address", userController.handleDeleteAddress);
+routeAPI.put("/user/address/select", userController.handleSelectAddress);
+routeAPI.post("/user/address/add", userController.handleAddAddress);
+routeAPI.delete("/user/address/delete/:id_address", userController.handleDeleteAddress);
+routeAPI.put("/user/address/edit", userController.handleEditAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
 routeAPI.post("/user/check-coupon", userController.handleCheckCoupon);
 
