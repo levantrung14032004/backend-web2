@@ -25,7 +25,6 @@ import {
 } from "../controllers/company.js";
 
 import {
-  handleCreateEmployee,
   handleGetCurentEmployee,
   handleGetEmployee,
   handleDeleteEmployee,
@@ -35,7 +34,6 @@ import {
 import { handleGetGoodsReceived } from "../controllers/received.js";
 
 import {
-  handleGetActionById,
   handleGetActionView,
   handleGetAllPermission,
   handleGetCurrentAction,
@@ -79,7 +77,6 @@ routeAPI.post("/auth/logout", verifyToken, handleLogOut);
 
 // Employee
 routeAPI.get("/employee", verifyToken, handleGetEmployee);
-routeAPI.post("/employee", verifyToken, handleCreateEmployee);
 routeAPI.get("/employee-current", verifyToken, handleGetCurentEmployee);
 routeAPI.post("/edit-employee", verifyToken, handleEditEmployee);
 routeAPI.put("/employee", verifyToken, handleDeleteEmployee);

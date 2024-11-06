@@ -19,16 +19,21 @@ const generateRefreshToken = (employee) => {
 };
 
 const handleRegisterEmployee = async (req, res) => {
+  console.log(req.body);
   try {
     const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(req.body.password, salt);
-    if (req.body.email !== "" && req.body.password !== "" && hashPassword) {
-      const email = req.body.email;
+    const hashPassword = await bcrypt.hash(req.body.value.password, salt);
+    if (
+      req.body.value.email !== "" &&
+      req.body.value.password !== "" &&
+      hashPassword
+    ) {
+      const email = req.body.value.email;
       const password = hashPassword;
-      const phone = req.body.phone;
-      const fullName = req.body.fullname;
-      const address = req.body.address;
-      const role_id = req.body.role_id;
+      const phone = req.body.value.phone_number;
+      const fullName = req.body.value.fullname;
+      const address = req.body.value.address;
+      const role_id = req.body.value.role;
       const result = await registerEmployee(
         role_id,
         fullName,
@@ -46,7 +51,7 @@ const handleRegisterEmployee = async (req, res) => {
       res.status(400).json("Không được bỏ trống email hoặc mật khẩu");
     }
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json("Loi" + error);
   }
 };
 
