@@ -662,3 +662,16 @@ where cf.id_user = ${id} and c.coupon_code = "${coupon}" and cf.status = 1 and c
     return null;
   }
 };
+
+export const changeStatusUser = async (id, status) => {
+  try {
+    const [result] = await connection.execute(
+      `update user set status = ? where id = ?`,
+      [status, id]
+    );
+    return result;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};

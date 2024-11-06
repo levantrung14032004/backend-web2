@@ -39,6 +39,7 @@ const handleCreateReceived = async function (req, res) {
     let companyId = req.body.companyId;
     let note = req.body.note;
     let products = req.body.products;
+    console.log({ companyId, note, products });
     const result = await createGoodsReceived(
       currentTime,
       companyId,

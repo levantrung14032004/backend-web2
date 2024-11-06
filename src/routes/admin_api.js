@@ -14,6 +14,7 @@ import {
   handleEditInfoById,
   handleAddOrder,
   handleGetAllUsers,
+  handleChangeStatusUser,
 } from "../controllers/user.js";
 
 import {
@@ -43,7 +44,12 @@ import {
   handleSetPermission,
 } from "../controllers/permission.js";
 
-import { handleGetAuthors, handleAddAuthor } from "../controllers/author.js";
+import {
+  handleGetAuthors,
+  handleAddAuthor,
+  handleUpdateAuthor,
+  handleDeleteAuthor,
+} from "../controllers/author.js";
 import express from "express";
 import * as products from "../controllers/product.js";
 import * as category from "../controllers/category.js";
@@ -115,11 +121,12 @@ routeAPI.post("/creat-temp-product", handleCreateProductTemp);
 routeAPI.get("/user", verifyToken, handleGetAllUsers);
 routeAPI.get("/user/info", verifyToken, handleGetInfoById);
 routeAPI.put("/user/info", verifyToken, handleEditInfoById);
+routeAPI.put("/user/change-status", verifyToken, handleChangeStatusUser);
 
 routeAPI.post("/user/add_order", handleAddOrder);
 
 // Admin Order
-routeAPI.post("/order/totalDate", verifyToken, handleGetTotalWithDate);
+routeAPI.post("/order/totalDate", handleGetTotalWithDate);
 routeAPI.get("/order/top-selling", verifyToken, handleGetTopSelling);
 routeAPI.post("/order/date-to-date", verifyToken, handleGetDashDtoD);
 routeAPI.get("/order/get-all-order-admin", verifyToken, handleGetOrderByAdmin);
@@ -129,17 +136,19 @@ routeAPI.get("/order/get-total-3d", verifyToken, handleGetTotal3D);
 routeAPI.get("/order/get-total-7d", verifyToken, handleGetTotal7D);
 
 // Goods
-routeAPI.post("/create-received", handleCreateReceived);
+routeAPI.post("/create-received", verifyToken, handleCreateReceived);
 
 // Company
-routeAPI.get("/company", handleGetCompany);
-routeAPI.post("/company", handleInsertCompany);
-routeAPI.put("/company", handleDeleteCompany);
+routeAPI.get("/company", verifyToken, handleGetCompany);
+routeAPI.post("/company", verifyToken, handleInsertCompany);
+routeAPI.put("/company", verifyToken, handleDeleteCompany);
 
 // Authors
 
-routeAPI.get("/author", handleGetAuthors);
+routeAPI.get("/author", verifyToken, handleGetAuthors);
 routeAPI.post("/author/add", upload.single("author"), handleAddAuthor);
+routeAPI.put("/author/update", upload.single("author"), handleUpdateAuthor);
+routeAPI.put("/author/delete", verifyToken, handleDeleteAuthor);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);
