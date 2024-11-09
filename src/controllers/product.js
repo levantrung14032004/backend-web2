@@ -87,8 +87,9 @@ export const add_product = async (req, res) => {
     const title = req.body.name;
     const url_img = url_images[0].URL;
     const description = req.body.description;
+    const introduce = req.body.introduce;
 
-    if (!categories || !title || !url_img || !description) {
+    if (!categories || !title || !url_img || !description || !introduce) {
       return res.status(400).json("Missing information");
     }
     const add_product_response = await productService.addProduct(
@@ -96,7 +97,8 @@ export const add_product = async (req, res) => {
       author_id,
       title,
       url_img,
-      description
+      description,
+      introduce
     );
     //add thumbnail
     const add_thumbnail = url_images.map((url_image) =>
@@ -104,7 +106,10 @@ export const add_product = async (req, res) => {
     );
     const add_thumbnail_response = await Promise.all(add_thumbnail);
 
-    res.status(200).json(add_product_response);
+    res.status(200).json({
+      success: true,
+      message: "Add product success",
+    });
   } catch (error) {
     res.status(500).json(error);
   }

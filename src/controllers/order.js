@@ -20,7 +20,7 @@ export const handleGetOrderByAdmin = async (req, res) => {
     const orders = await orderService.getOrderByAdmin();
     if (orders) {
       const result = orders.reduce((acc, order) => {
-        const found = acc.find((item) => item.id === order.id);
+        const found = acc.find((item) => item.orderId === order.id);
         if (!found) {
           acc.push({
             orderId: order.id,
@@ -59,11 +59,6 @@ export const handleGetOrderByAdmin = async (req, res) => {
   } catch (error) {
     res.status(500).json(error);
   }
-};
-
-export const handleCreateOrder = (req, res) => {
-  const values = req.body;
-  console.log(values);
 };
 
 export const handleGetTotalWithDate = async (req, res) => {
@@ -114,6 +109,34 @@ export const handleGetOrderStatus = async (req, res) => {
   try {
     const status = await orderService.getOrderStatus();
     res.status(200).json(status);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleUpdateOrderStatus = async (req, res) => {
+  try {
+    const orderId = req.body.orderId;
+    const employeeId = req.employee.id;
+    const status = req.body.status;
+    if (!orderId || !status) {
+      res.status(400).json({
+        error: 1,
+        message: "Missing orderId or status",
+      });
+    } else {
+      const result = await orderService.updateOrderStatus(
+        orderId,
+        employeeId,
+        status
+      );
+      if (result) {
+        res.status(200).json({
+          success: true,
+          message: "Đã lưu thay đổi",
+        });
+      }
+    }
   } catch (error) {
     res.status(500).json(error);
   }

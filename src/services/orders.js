@@ -106,6 +106,19 @@ export const getOrderStatus = async () => {
   }
 };
 
+export const updateOrderStatus = async (id, employee_id, status) => {
+  try {
+    const [rows, fields] = await connection.execute(
+      `UPDATE ${process.env.DATABASE_NAME}.order SET status = ?, employee_id = ? WHERE id = ?`,
+      [status, employee_id, id]
+    );
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 export const getRevenueAndOrderOne = async () => {
   try {
     const [revenue, fields] = await connection.execute(

@@ -79,7 +79,10 @@ routeAPI.get("/user/order", order.getOrderByUser);
 routeAPI.get("/user/address", handleGetAddressById);
 routeAPI.put("/user/address/select", userController.handleSelectAddress);
 routeAPI.post("/user/address/add", userController.handleAddAddress);
-routeAPI.delete("/user/address/delete/:id_address", userController.handleDeleteAddress);
+routeAPI.delete(
+  "/user/address/delete/:id_address",
+  userController.handleDeleteAddress
+);
 routeAPI.put("/user/address/edit", userController.handleEditAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
 routeAPI.post("/user/check-coupon", userController.handleCheckCoupon);
@@ -96,8 +99,5 @@ routeAPI.put("/company", handleDeleteCompany);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);
-
-//order
-routeAPI.post("/order", order.handleCreateOrder);
 
 export default routeAPI;

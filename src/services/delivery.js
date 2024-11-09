@@ -60,6 +60,24 @@ const createGoodsReceived = async (
       await connection.execute(`update product 
                                 set price = ${newPrice}
                                 where product.id = ${product.id}`);
+
+      const currentQuantity = await connection.execute(
+        `select quantity from product where product.id = ${product.id}`
+      );
+      if (
+        currentQuantity[0].quantity == null ||
+        currentQuantity[0].quantity == 0
+      ) {
+        await connection.execute(`update product 
+                                set quantity = ${product.quantity}
+                                where product.id = ${product.id}`);
+      } else {
+        await connection.execute(`update product 
+                                  set quantity = ${
+                                    currentQuantity + product.quantity
+                                  }
+                                  where product.id = ${product.id}`);
+      }
     });
 
     return true;
