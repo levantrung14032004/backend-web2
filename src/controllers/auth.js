@@ -1,8 +1,8 @@
+import { error } from "console";
 import * as authService from "../services/auth.js";
 import * as userService from "../services/user.js";
 import create_token from "../utils/create_token.js";
 import jwt from "jsonwebtoken";
-import connection from "../database/database.js";
 export const login = async (req, res) => {
   try {
     const email = req.body.email;
@@ -158,13 +158,88 @@ export const refresh_token = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.status(500).json({message: "Internal server error"});
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 export const check_status = async (req, res) => {
-  return res.status(200).json({
-    error: req.session.user_id ? 0 : 1,
-  });
+  try {
+    const id = req.session.user_id;
+    if (id) {
+      return res.status(200).json({
+        error: 0,
+      });
+    }
+    const refresh_token = req.cookies["refresh_token"];
+    if (!refresh_token) {
+      return res.status(200).json({
+        error: 1,
+      });
+    }
+    const public_key_refresh_token =
+      await userService.get_publicKey_refreshTokenByRefreshToken(refresh_token);
+    if (public_key_refresh_token.error === 1) {
+      return res.status(200).json({
+        error: 1,
+      });
+    }
+    jwt.verify(
+      refresh_token,
+      public_key_refresh_token.publicKey_RefreshToken,
+      async (err, data) => {
+        if (err) {
+          return res.status(200).json({
+            error: 1,
+          });
+        }
+        const userAgent = req.headers["user-agent"];
+        const ipAddress =
+          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
+          return res.status(401).json({
+            error: 1,
+          });
+        }
+        const {
+          token,
+          refresh_token,
+          public_key_token,
+          public_key_refresh_token,
+        } = create_token(data.id, data.role_id, userAgent, ipAddress);
+
+        const updateToken = await userService.update_token_user(
+          public_key_token,
+          public_key_refresh_token,
+          refresh_token,
+          data.id
+        );
+        if (updateToken.error === 1) {
+          return res.status(200).json({
+            error: 1,
+          });
+        }
+        req.session.user_id = data.id;
+        return res
+          .cookie("access_token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+          })
+          .cookie("refresh_token", refresh_token, {
+            expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+          })
+          .status(200)
+          .json({
+            error: 0,
+          });
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 1 });
+  }
 };
 export const logout = async (req, res) => {
   try {

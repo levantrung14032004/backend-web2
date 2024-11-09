@@ -38,7 +38,7 @@ export const update_token_user = (
 //           from ${process.env.DATABASE_NAME}.order o
 //           join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
 //           join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
-//           join ${process.env.DATABASE_NAME}.orderstatus os on os.id = o.status 
+//           join ${process.env.DATABASE_NAME}.orderstatus os on os.id = o.status
 //           where o.user_id = ?;`,
 //       [userId]
 //     );
@@ -150,7 +150,6 @@ const addOrder = (
         });
         return;
       }
-      // const productsInOrder = products;
       const values = [];
       const placeholders = products
         .map((product) => {
@@ -170,7 +169,6 @@ const addOrder = (
       VALUES ${placeholders}
     `;
       const [addOrderDetail] = await client.execute(sql_addOrderDetail, values);
-      console.log("addOrderDetail", addOrderDetail);
       if (addOrderDetail.affectedRows === 0) {
         await client.rollback();
         resolve({
@@ -188,7 +186,6 @@ const addOrder = (
         .map((product) => `${product.id}`)
         .join(",")});`;
       const [updateProduct] = await client.execute(sql_updateProduct);
-      console.log("updateProduct", updateProduct);
       if (updateProduct.affectedRows === 0) {
         await client.rollback();
         resolve({
@@ -202,38 +199,6 @@ const addOrder = (
         error: 0,
         message: "Đặt hàng thành công",
       });
-      // productsInOrder.forEach(async (product) => {
-      //   let productId = product.id;
-      //   let productPrice = product.price;
-      //   let productQuantity = product.quantity;
-      //   let productTotal = product.total_price;
-      //   let productThumbnail = product.thumbnail;
-
-      //   await client.execute(
-      //     `INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status) VALUES (?, ?, ?, ?, ?, ?, 1)`,
-      //     [
-      //       addOrder.insertId,
-      //       productId,
-      //       productPrice,
-      //       productQuantity,
-      //       productTotal,
-      //       productThumbnail,
-      //     ]
-      //   );
-
-      //   await client.execute(
-      //     `UPDATE product SET quantity = quantity - ? WHERE id = ?`,
-      //     [productQuantity, productId]
-      //   );
-      // });
-
-      //   await client.execute(
-      //     `update user
-      // set fullname = ?, address = ?, phone_number = ?
-      // where id = ?`,
-      //     [fullname, address, phoneNumber, user_id]
-      //   );
-      //   return true;
     } catch (error) {
       console.log(error);
       await client.rollback();
@@ -741,3 +706,23 @@ export const changeStatusUser = async (id, status) => {
     return null;
   }
 };
+export const get_publicKey_refreshTokenByRefreshToken = (refresh_token) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.query(
+        `SELECT publicKey_RefreshToken FROM user WHERE RefreshToken = ?`,
+        [refresh_token]
+      );
+      const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
+      resolve({
+        error: publicKey_RefreshToken ? 0 : 1,
+        publicKey_RefreshToken: publicKey_RefreshToken || null,
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        publicKey_RefreshToken: null,
+      });
+    }
+  });

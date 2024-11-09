@@ -48,6 +48,7 @@ const handleAddAuthor = async (req, res) => {
 const handleUpdateAuthor = async (req, res) => {
   try {
     const { id, name, information } = req.body;
+
     const thumbnail = req.file;
     console.log(thumbnail);
     if (!thumbnail) {
@@ -58,7 +59,7 @@ const handleUpdateAuthor = async (req, res) => {
       return res.status(400).json("Lưu ảnh thất bại");
     }
     console.log(req.body, uploadIMG.URL);
-    const result = await updateAuthor(id, name, thumbnail, information);
+    const result = await updateAuthor(id, name, information, uploadIMG.URL);
     if (result) {
       res.status(200).json("Cap nhat tac gia thanh cong");
     } else {
