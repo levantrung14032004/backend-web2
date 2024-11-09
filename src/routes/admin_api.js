@@ -61,6 +61,7 @@ import {
   handleGetTotal3D,
   handleGetTotal7D,
   handleGetTotalWithDate,
+  handleUpdateOrderStatus,
 } from "../controllers/order.js";
 import {
   handleRegisterEmployee,
@@ -126,8 +127,13 @@ routeAPI.post("/user/add_order", handleAddOrder);
 routeAPI.post("/order/totalDate", handleGetTotalWithDate);
 routeAPI.get("/order/top-selling", verifyToken, handleGetTopSelling);
 routeAPI.post("/order/date-to-date", verifyToken, handleGetDashDtoD);
-routeAPI.get("/order/get-all-order-admin", verifyToken, handleGetOrderByAdmin);
+routeAPI.get("/order/get-all-order-admin", handleGetOrderByAdmin);
 routeAPI.get("/order/get-order-status", verifyToken, handleGetOrderStatus);
+routeAPI.put(
+  "/order/update-order-status",
+  verifyToken,
+  handleUpdateOrderStatus
+);
 routeAPI.get("/order/get-total-1d", verifyToken, handleGetTotal1D);
 routeAPI.get("/order/get-total-3d", verifyToken, handleGetTotal3D);
 routeAPI.get("/order/get-total-7d", verifyToken, handleGetTotal7D);

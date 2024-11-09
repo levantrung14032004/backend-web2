@@ -5,7 +5,7 @@ export const getProduct = () =>
     try {
       const [rows, fields] = await connection.query(`SELECT 
 		p.*,
-        GROUP_CONCAT(DISTINCT JSON_OBJECT('id', c.id, 'name', c.name)) AS category,
+        GROUP_CONCAT(DISTINCT JSON_OBJECT('id', c.id, 'label', c.name)) AS category,
         GROUP_CONCAT(DISTINCT g.thumbnail) AS gallery
       FROM 
         product p
@@ -58,15 +58,16 @@ export const addProduct = (
   author_id,
   title,
   url_img,
-  description
+  description,
+  introduce
 ) =>
   new Promise(async (resolve, reject) => {
     let client;
     try {
       client = await connection.getConnection();
       const [result, fields] = await client.execute(
-        "INSERT INTO product(author_id, title, thumbnail, description,created_at,update_at, status) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)",
-        [author_id, title, url_img, description]
+        "INSERT INTO product(author_id, title, thumbnail, description,introduce,created_at,update_at, status) VALUES (?, ?, ?, ?,?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)",
+        [author_id, title, url_img, description, introduce]
       );
       if (result.affectedRows === 0) {
         await client.rollback();
