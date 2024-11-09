@@ -36,7 +36,10 @@ const addAuthor = (name, thumbnail, information) =>
       );
       resolve({
         error: result.affectedRows === 0 ? 1 : 0,
-        message: result.affectedRows === 0 ? "Thêm tác giả thất bại" : "Thêm tác giả thành công",
+        message:
+          result.affectedRows === 0
+            ? "Thêm tác giả thất bại"
+            : "Thêm tác giả thành công",
       });
     } catch (error) {
       console.log(error);
@@ -47,11 +50,11 @@ const addAuthor = (name, thumbnail, information) =>
     }
   });
 
-const updateAuthor = async (id, infomation) => {
+const updateAuthor = async (id, name, infomation, thumbnail) => {
   try {
     const [result, fields] = await connection.execute(
       "update author set name = ?, thumbnail = ?, infomation = ? where id = ?",
-      [...infomation, id]
+      [name, thumbnail, infomation, id]
     );
     if (result.affectedRows) return true;
     return false;
@@ -60,11 +63,11 @@ const updateAuthor = async (id, infomation) => {
     return false;
   }
 };
-const deleteAuthor = async (id) => {
+const deleteAuthor = async (id, status) => {
   try {
     const [result, fields] = await connection.execute(
-      "delete from author where id = ?",
-      [id]
+      "update author set status = ? where id = ?",
+      [status ? 0 : 1, id]
     );
     if (result.affectedRows) return true;
     return false;

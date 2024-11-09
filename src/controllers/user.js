@@ -412,3 +412,19 @@ export const handleCheckCoupon = async (req, res) => {
     res.status(500).error(error);
   }
 };
+
+export const handleChangeStatusUser = async (req, res) => {
+  try {
+    const id = req.body.id;
+    const status = req.body.status;
+    const result = await userService.changeStatusUser(id, status);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(501).json("Khong the thay doi trang thai");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error);
+  }
+};

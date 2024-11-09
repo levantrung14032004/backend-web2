@@ -3,6 +3,7 @@ import {
   getAuthorById,
   addAuthor,
   updateAuthor,
+  deleteAuthor,
 } from "../services/author.js";
 import uploadIMG_service from "../services/uploadIMG.js";
 
@@ -23,7 +24,9 @@ const handleGetAuthors = async (req, res) => {
 const handleAddAuthor = async (req, res) => {
   try {
     const { name, information } = req.body;
+
     const thumbnail = req.file;
+
     if (!thumbnail) {
       return res.status(400).json("Thiếu ảnh đại diện");
     }
@@ -31,7 +34,6 @@ const handleAddAuthor = async (req, res) => {
     if (uploadIMG.error === 1) {
       return res.status(400).json("Lưu ảnh thất bại");
     }
-    console.log(req.body);
     if (!name || !information) {
       return res.status(400).json("Thiếu thông tin");
     }
@@ -45,9 +47,18 @@ const handleAddAuthor = async (req, res) => {
 
 const handleUpdateAuthor = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, thumbnail, information } = req.body;
-    const result = await updateAuthor(id, [name, thumbnail, information]);
+    const { id, name, information } = req.body;
+    const thumbnail = req.file;
+    console.log(thumbnail);
+    if (!thumbnail) {
+      return res.status(400).json("Thiếu ảnh đại diện");
+    }
+    const uploadIMG = await uploadIMG_service(thumbnail);
+    if (uploadIMG.error === 1) {
+      return res.status(400).json("Lưu ảnh thất bại");
+    }
+    console.log(req.body, uploadIMG.URL);
+    const result = await updateAuthor(id, name, thumbnail, information);
     if (result) {
       res.status(200).json("Cap nhat tac gia thanh cong");
     } else {
@@ -76,8 +87,8 @@ const handleGetAuthorById = async (req, res) => {
 
 const handleDeleteAuthor = async (req, res) => {
   try {
-    const { id } = req.params;
-    const author = await deleteAuthor(id);
+    const { id, status } = req.body;
+    const author = await deleteAuthor(id, status);
     if (author !== null) {
       res.status(200).json("Xoa tac gia thanh cong");
     } else {
@@ -93,4 +104,5 @@ export {
   handleAddAuthor,
   handleUpdateAuthor,
   handleGetAuthorById,
+  handleDeleteAuthor,
 };

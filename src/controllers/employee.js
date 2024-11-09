@@ -1,10 +1,10 @@
 import {
   getEmployee,
-  createEmployee,
   getCurrentEmployee,
   deleteCurrentEmployee,
   editCurrentEmployee,
 } from "../services/employee.js";
+import { handleRegisterEmployee } from "./adminAuth.js";
 
 const handleGetEmployee = async (req, res) => {
   try {
@@ -13,21 +13,6 @@ const handleGetEmployee = async (req, res) => {
       res.status(200).json(result);
     } else {
       res.status(504).error("Co loi khi lay len tat ca nhan vien");
-    }
-  } catch (error) {
-    console.error(error);
-    res.json(error);
-  }
-};
-
-const handleCreateEmployee = async (req, res) => {
-  try {
-    const value = req.body.value;
-    const result = await createEmployee(value);
-    if (result) {
-      res.status(200).json(result);
-    } else {
-      res.status(504).error("Co loi khi tao nhan vien");
     }
   } catch (error) {
     console.error(error);
@@ -82,7 +67,6 @@ const handleEditEmployee = async (req, res) => {
 
 export {
   handleGetEmployee,
-  handleCreateEmployee,
   handleGetCurentEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
