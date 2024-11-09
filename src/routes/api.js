@@ -11,7 +11,6 @@ import {
 import { handleCreateProductTemp } from "../controllers/tempProduct.js";
 
 import {
-  handleGetAllOrder,
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
@@ -71,11 +70,10 @@ routeAPI.get("/cart/getCart", cart.getCart);
 routeAPI.post("/cart/addToCart", cart.addToCart);
 routeAPI.post("/cart/removeFromCart", cart.removeFromCart);
 // User
-routeAPI.get("/user", handleGetAllUsers);
-routeAPI.post("/user/orders", handleGetAllOrder);
 routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info/edit", userController.changeInfo);
 routeAPI.get("/user/order", order.getOrderByUser);
+routeAPI.put("/user/order/cancel", order.cancelOrder);
 routeAPI.get("/user/address", handleGetAddressById);
 routeAPI.put("/user/address/select", userController.handleSelectAddress);
 routeAPI.post("/user/address/add", userController.handleAddAddress);
@@ -84,7 +82,7 @@ routeAPI.put("/user/address/edit", userController.handleEditAddress);
 routeAPI.get("/user/coupon", userController.handleGetCouponUser);
 routeAPI.post("/user/check-coupon", userController.handleCheckCoupon);
 
-routeAPI.post("/user/add_order", handleAddOrder);
+routeAPI.post("/user/order/add", handleAddOrder);
 
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);

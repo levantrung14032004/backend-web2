@@ -31,46 +31,48 @@ export const update_token_user = (
       reject(error);
     }
   });
-const getAllOrder = async (userId) => {
-  try {
-    const [result, fields] = await connection.execute(
-      `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status
-          from ${process.env.DATABASE_NAME}.order o
-          join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
-          join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
-          where o.user_id = ?;`,
-      [userId]
-    );
+// const getAllOrder = async (userId) => {
+//   try {
+//     const [result, fields] = await connection.execute(
+//       `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status, os.name
+//           from ${process.env.DATABASE_NAME}.order o
+//           join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
+//           join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
+//           join ${process.env.DATABASE_NAME}.orderstatus os on os.id = o.status 
+//           where o.user_id = ?;`,
+//       [userId]
+//     );
 
-    let orders = {};
-    result.map((order) => {
-      const order_id = order.id;
-      if (!orders.order_id) {
-        orders.order_id = {
-          orderId: order_id,
-          products: [],
-          total: order.total_money,
-          orderDate: order.order_date,
-          status: order.status,
-        };
-      }
+//     let orders = {};
+//     result.map((order) => {
+//       const order_id = order.id;
+//       if (!orders.order_id) {
+//         orders.order_id = {
+//           orderId: order_id,
+//           products: [],
+//           total: order.total_money,
+//           orderDate: order.order_date,
+//           status: order.status,
+//           statusName: order.name,
+//         };
+//       }
 
-      orders.order_id.products.push({
-        productName: order.title,
-        quantity: order.num,
-        unitPrice: order.price,
-      });
-    });
-    if (orders.order_id) {
-      return orders.order_id;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+//       orders.order_id.products.push({
+//         productName: order.title,
+//         quantity: order.num,
+//         unitPrice: order.price,
+//       });
+//     });
+//     if (orders.order_id) {
+//       return orders.order_id;
+//     } else {
+//       return null;
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// };
 
 const getInfoById = async (id) => {
   try {
@@ -108,7 +110,7 @@ const editInfo = (firstName, lastName, fullName, id) =>
     }
   });
 
-const addOrder = async (
+const addOrder = (
   user_id,
   fullname,
   phoneNumber,
@@ -120,67 +122,131 @@ const addOrder = async (
   total,
   employeeId,
   products
-) => {
-  try {
-    await connection.execute(
-      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,discount, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),2)`,
-      [
-        user_id,
-        employeeId,
-        fullname,
-        phoneNumber,
-        email,
-        address,
-        note,
-        shipFee,
-        discount,
-        total,
-      ]
-    );
-    const [lastId, another] = await connection.query(
-      `SELECT id FROM ${process.env.DATABASE_NAME}.order ORDER BY id DESC LIMIT 1;`
-    );
-
-    const productsInOrder = products;
-    productsInOrder.forEach(async (product) => {
-      let productId = product.id;
-      let productPrice = product.price;
-      let productQuantity = product.quantity;
-      let productTotal = product.total_price;
-      let productThumbnail = product.thumbnail;
-
-      await connection.execute(
-        `INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status) VALUES (?, ?, ?, ?, ?, ?, 1)`,
+) =>
+  new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [addOrder] = await client.execute(
+        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,discount, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
         [
-          lastId[0].id,
-          productId,
-          productPrice,
-          productQuantity,
-          productTotal,
-          productThumbnail,
+          user_id,
+          employeeId,
+          fullname,
+          phoneNumber,
+          email,
+          address,
+          note,
+          shipFee,
+          discount,
+          total,
         ]
       );
+      if (addOrder.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      // const productsInOrder = products;
+      const values = [];
+      const placeholders = products
+        .map((product) => {
+          values.push(
+            addOrder.insertId,
+            product.id,
+            product.price,
+            product.quantity,
+            product.total_price,
+            product.thumbnail
+          );
+          return "(?, ?, ?, ?, ?, ?, 1)";
+        })
+        .join(", ");
+      const sql_addOrderDetail = `
+      INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status)
+      VALUES ${placeholders}
+    `;
+      const [addOrderDetail] = await client.execute(sql_addOrderDetail, values);
+      console.log("addOrderDetail", addOrderDetail);
+      if (addOrderDetail.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      const sql_updateProduct = `UPDATE product SET quantity = CASE ${products
+        .map(
+          (product) =>
+            `WHEN id = ${product.id} THEN quantity - ${product.quantity}`
+        )
+        .join(" ")} ELSE quantity END WHERE id IN (${products
+        .map((product) => `${product.id}`)
+        .join(",")});`;
+      const [updateProduct] = await client.execute(sql_updateProduct);
+      console.log("updateProduct", updateProduct);
+      if (updateProduct.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      await client.commit();
+      resolve({
+        error: 0,
+        message: "Đặt hàng thành công",
+      });
+      // productsInOrder.forEach(async (product) => {
+      //   let productId = product.id;
+      //   let productPrice = product.price;
+      //   let productQuantity = product.quantity;
+      //   let productTotal = product.total_price;
+      //   let productThumbnail = product.thumbnail;
 
-      await connection.execute(
-        `UPDATE product SET quantity = quantity - ? WHERE id = ?`,
-        [productQuantity, productId]
-      );
-    });
+      //   await client.execute(
+      //     `INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status) VALUES (?, ?, ?, ?, ?, ?, 1)`,
+      //     [
+      //       addOrder.insertId,
+      //       productId,
+      //       productPrice,
+      //       productQuantity,
+      //       productTotal,
+      //       productThumbnail,
+      //     ]
+      //   );
 
-    await connection.execute(
-      `update user 
-    set fullname = ?, address = ?, phone_number = ? 
-    where id = ?`,
-      [fullname, address, phoneNumber, user_id]
-    );
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
+      //   await client.execute(
+      //     `UPDATE product SET quantity = quantity - ? WHERE id = ?`,
+      //     [productQuantity, productId]
+      //   );
+      // });
 
-export { getUsers, getAllOrder, getInfoById, editInfo, addOrder };
+      //   await client.execute(
+      //     `update user
+      // set fullname = ?, address = ?, phone_number = ?
+      // where id = ?`,
+      //     [fullname, address, phoneNumber, user_id]
+      //   );
+      //   return true;
+    } catch (error) {
+      console.log(error);
+      await client.rollback();
+      reject({
+        error: 1,
+        message: "Đặt hàng thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
+
+export { getUsers, getInfoById, editInfo, addOrder };
 
 export const get_publicKey_accessToken = (id) =>
   new Promise(async (resolve, reject) => {
@@ -662,3 +728,4 @@ where cf.id_user = ${id} and c.coupon_code = "${coupon}" and cf.status = 1 and c
     return null;
   }
 };
+export const cancelOrder = (id) => new Promise(async (resolve, reject) => {});

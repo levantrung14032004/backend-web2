@@ -1,3 +1,4 @@
+import { error } from "console";
 import connection from "../database/database.js";
 import dot from "dotenv";
 dot.config();
@@ -5,7 +6,7 @@ export const getOrderByUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {
       const [rows, fields] = await connection.query(
-        `select o.id, o.order_date, o.status, o.total_money, GROUP_CONCAT(distinct JSON_OBJECT('id',od.id,'name',p.title, 'thumbnail', od.thumbnail,'unitPrice',od.price,'quantity',od.num)) AS order_detail FROM ${process.env.DATABASE_NAME}.order o join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id join product p on od.product_id = p.id where o.user_id = ? and od.status = 1 GROUP BY o.id ORDER BY o.order_date DESC`,
+        `select o.id, o.order_date, o.status, s.name, o.total_money, GROUP_CONCAT(distinct JSON_OBJECT('id',od.id,'name',p.title, 'thumbnail', od.thumbnail,'unitPrice',od.price,'quantity',od.num)) AS order_detail FROM ${process.env.DATABASE_NAME}.order o join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id join product p on od.product_id = p.id join orderstatus s on o.status = s.id where o.user_id = ? and od.status = 1 GROUP BY o.id ORDER BY o.order_date DESC`,
         [id]
       );
       const orders = rows.map((order) => {
@@ -162,3 +163,25 @@ export const getRevenueAndOrderSeven = async () => {
     return null;
   }
 };
+export const cancelOrder = (id, userId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(
+        `UPDATE ${process.env.DATABASE_NAME}.order SET status = 8 WHERE id = ? and user_id = ?`,
+        [id, userId]
+      );
+      resolve({
+        error: rows.affectedRows === 0 ? 1 : 0,
+        message:
+          rows.affectedRows === 0
+            ? "Hủy đơn hàng thất bại"
+            : "Hủy đơn hàng thành công",
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: "Hủy đơn hàng thất bại",
+      });
+    }
+  });

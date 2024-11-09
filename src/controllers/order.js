@@ -14,7 +14,22 @@ export const getOrderByUser = async (req, res) => {
     res.status(500).json(error);
   }
 };
-
+export const cancelOrder = async (req, res) => {
+  try {
+    const id = req.data.id;
+    const id_order = req.body.id_order;
+    if (!id || !id_order) {
+      return res.status(400).json({
+        error: 1,
+        message: "Thiếu thông tin",
+      });
+    }
+    const result = await orderService.cancelOrder(id_order, id);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
 export const handleGetOrderByAdmin = async (req, res) => {
   try {
     const orders = await orderService.getOrderByAdmin();

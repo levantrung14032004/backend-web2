@@ -1,6 +1,5 @@
 import {
   getUsers,
-  getAllOrder,
   getInfoById,
   editInfo,
   addOrder,
@@ -18,21 +17,6 @@ const handleGetAllUsers = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(501).json(error.message);
-  }
-};
-
-const handleGetAllOrder = async (req, res) => {
-  try {
-    let user_id = req.body.user_id;
-    const result = await getAllOrder(user_id);
-    if (result != null) {
-      res.status(200).json(result);
-    } else {
-      res.status(500).json("Nguoi dung khong ton tai");
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
   }
 };
 
@@ -130,18 +114,45 @@ export const changeInfo = async (req, res) => {
 };
 const handleAddOrder = async (req, res) => {
   try {
-    let user_id = req.data.id;
-    let fullname = req.body.fullname;
-    let phoneNumber = req.body.phoneNumber;
-    let address = req.body.address;
-    let email = req.body.email;
-    let note = req.body.note;
-    let shipFee = req.body.shipFee;
-    let discount = req.body.discount;
-    let total = req.body.total;
-    let employeeId = req.body.employeeId;
-    let products = req.body.products;
-
+    const user_id = req.data.id;
+    // let fullname = req.body.fullname;
+    // let phoneNumber = req.body.phoneNumber;
+    // let address = req.body.address;
+    // let email = req.body.email;
+    // let note = req.body.note;
+    // let shipFee = req.body.shipFee;
+    // let discount = req.body.discount;
+    // let total = req.body.total;
+    // let employeeId = req.body.employeeId;
+    // let products = req.body.products;
+    const {
+      employeeId,
+      fullname,
+      phoneNumber,
+      email,
+      address,
+      products,
+      note,
+      discount,
+      shipFee,
+      total,
+    } = req.body;
+    console.log(req.body);
+    if (
+      !fullname ||
+      !phoneNumber ||
+      !email ||
+      !address ||
+      products.length === 0 ||
+      discount === null ||
+      shipFee === null ||
+      total === null
+    ) {
+      return res.status(400).json({
+        error: 1,
+        message: "Thiếu thông tin",
+      });
+    }
     const result = await addOrder(
       user_id,
       fullname,
@@ -156,22 +167,14 @@ const handleAddOrder = async (req, res) => {
       products
     );
     console.log(result);
-
-    if (result) {
-      res.status(200).json({
-        status: true,
-        message: "Đơn hàng đã được thêm thành công",
-      });
-    } else {
-      res
-        .status(500)
-        .json({ status: false, message: "Đơn hàng thêm thất bại" });
-    }
-  } catch (error) {}
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
 };
 
 export {
-  handleGetAllOrder,
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
