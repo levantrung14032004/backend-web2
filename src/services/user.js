@@ -118,7 +118,7 @@ const addOrder = (
   email,
   note,
   shipFee,
-  discount,
+  id_coupon,
   total,
   employeeId,
   products
@@ -129,7 +129,7 @@ const addOrder = (
       client = await connection.getConnection();
       await client.beginTransaction();
       const [addOrder] = await client.execute(
-        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,discount, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
+        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,id_coupon, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
         [
           user_id,
           employeeId,
@@ -139,7 +139,7 @@ const addOrder = (
           address,
           note,
           shipFee,
-          discount,
+          id_coupon,
           total,
         ]
       );
@@ -677,22 +677,33 @@ export const getCouponUser = (id) =>
     }
   });
 
-export const checkValidCoupon = async (id, coupon, value_apply) => {
-  try {
-    const [result] =
-      await connection.execute(`select c.discount_value from coupon_for_user cf join coupon c on cf.id_coupon = c.id
-where cf.id_user = ${id} and c.coupon_code = "${coupon}" and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ${value_apply}`);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
+export const checkValidCoupon = (id, coupon, value_apply) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        `select c.discount_value, c.id from coupon_for_user cf join coupon c on cf.id_coupon = c.id
+where cf.id_user = ? and c.coupon_code = ? and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ?`,
+        [id, coupon, value_apply]
+      );
+      resolve({
+        error: result.length === 0 ? 1 : 0,
+        message:
+          result.length === 0
+            ? "Mã giảm giá đã hết hạn hoặc chưa đạt đến hạn mức áp dụng. Vui lòng kiểm tra lại!!!"
+            : "Áp dụng mã giảm giá thành công",
+        discount_value: result.length === 0 ? null : result[0].discount_value,
+        id: result.length === 0 ? null : result[0].id,
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: "Áp dụng mã giảm giá thất bại",
+        discount_value: null,
+        id: null,
+      });
     }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+  });
 
 export const changeStatusUser = async (id, status) => {
   try {

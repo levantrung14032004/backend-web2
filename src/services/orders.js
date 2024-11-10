@@ -1,4 +1,3 @@
-import { error } from "console";
 import connection from "../database/database.js";
 import dot from "dotenv";
 dot.config();
@@ -180,7 +179,7 @@ export const cancelOrder = (id, userId) =>
   new Promise(async (resolve, reject) => {
     try {
       const [rows, fields] = await connection.query(
-        `UPDATE ${process.env.DATABASE_NAME}.order SET status = 8 WHERE id = ? and user_id = ?`,
+        `UPDATE ${process.env.DATABASE_NAME}.order SET status = 8 WHERE id = ? and status = 1 and user_id = ?`,
         [id, userId]
       );
       resolve({

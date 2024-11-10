@@ -1,9 +1,4 @@
-import {
-  getUsers,
-  getInfoById,
-  editInfo,
-  addOrder,
-} from "../services/user.js";
+import { getUsers, getInfoById, editInfo, addOrder } from "../services/user.js";
 import * as userService from "../services/user.js";
 import * as regex from "../utils/regex.js";
 const handleGetAllUsers = async (req, res) => {
@@ -115,16 +110,6 @@ export const changeInfo = async (req, res) => {
 const handleAddOrder = async (req, res) => {
   try {
     const user_id = req.data.id;
-    // let fullname = req.body.fullname;
-    // let phoneNumber = req.body.phoneNumber;
-    // let address = req.body.address;
-    // let email = req.body.email;
-    // let note = req.body.note;
-    // let shipFee = req.body.shipFee;
-    // let discount = req.body.discount;
-    // let total = req.body.total;
-    // let employeeId = req.body.employeeId;
-    // let products = req.body.products;
     const {
       employeeId,
       fullname,
@@ -133,18 +118,16 @@ const handleAddOrder = async (req, res) => {
       address,
       products,
       note,
-      discount,
+      id_coupon,
       shipFee,
       total,
     } = req.body;
-    console.log(req.body);
     if (
       !fullname ||
       !phoneNumber ||
       !email ||
       !address ||
       products.length === 0 ||
-      discount === null ||
       shipFee === null ||
       total === null
     ) {
@@ -161,7 +144,7 @@ const handleAddOrder = async (req, res) => {
       email,
       note,
       shipFee,
-      discount,
+      id_coupon,
       total,
       employeeId,
       products
@@ -398,15 +381,10 @@ export const handleCheckCoupon = async (req, res) => {
     const id = req.data.id;
     const coupon = req.body.coupon;
     const value_apply = req.body.value_apply;
+    if (!coupon || !value_apply)
+      return res.status(400).json({ error: 1, message: "Thiếu thông tin" });
     const result = await userService.checkValidCoupon(id, coupon, value_apply);
-    if (result.length > 0) {
-      res.status(200).json(result);
-    } else {
-      res.status(200).json({
-        message:
-          "Mã giảm giá đã hết hạn hoặc chưa đạt đến hạn mức áp dụng. Vui lòng kiểm tra lại!!!",
-      });
-    }
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
     res.status(500).error(error);
