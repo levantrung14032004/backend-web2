@@ -63,7 +63,6 @@ routeAPI.get("/product/filter/title", handleSortTitle);
 
 // Temporary Product
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);
-
 routeAPI.use(authenticateToken);
 //cart
 routeAPI.get("/cart/getCart", cart.getCart);

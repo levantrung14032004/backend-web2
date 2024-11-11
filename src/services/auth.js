@@ -1,6 +1,6 @@
 import database from "../database/database.js";
 import bcrypt from "bcrypt";
-import { sendCode } from "../utils/sendmail.js";
+import { sendCode, sendNewPassword } from "../utils/sendmail.js";
 let verificationCodes = {};
 const saltRounds = 10;
 const hashPassword = (password) => {
@@ -141,3 +141,45 @@ export const verify_Code_Register = (email, code) => {
     message: "Code xác nhận không đúng",
   };
 };
+export const forgotPassword = (email) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [findUser] = await database.query(
+        "SELECT * FROM user WHERE email = ?",
+        [email]
+      );
+      if (findUser.length === 0) {
+        resolve({
+          error: 1,
+          message: "Email không tồn tại",
+        });
+        return;
+      }
+      const newPassword = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const [changePassword] = await database.execute(
+        "UPDATE user SET password = ? WHERE id = ?",
+        [hashPassword(newPassword), findUser[0].id]
+      );
+      if (changePassword.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Đặt lại mật khẩu thất bại",
+        });
+        return;
+      }
+      const result = await sendNewPassword(email, newPassword);
+      resolve({
+        error: result != null ? 0 : 1,
+        message:
+          result != null
+            ? "Mật khẩu mới đã được gửi đến email của bạn"
+            : "Gửi mật khẩu mới thất bại",
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: "Đặt lại mật khẩu thất bại",
+      });
+    }
+  });

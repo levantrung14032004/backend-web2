@@ -1,4 +1,3 @@
-import { error } from "console";
 import * as authService from "../services/auth.js";
 import * as userService from "../services/user.js";
 import create_token from "../utils/create_token.js";
@@ -302,4 +301,19 @@ export const verify_Code_Register = async (req, res) => {
   }
   const result = authService.verify_Code_Register(email, code);
   return res.status(result.error === 0 ? 200 : 401).json(result);
+};
+export const forgotPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    if (!email) {
+      return res.status(400).json({
+        error: 1,
+        message: "Không được bỏ trống email",
+      });
+    }
+    const result = await authService.forgotPassword(email);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
