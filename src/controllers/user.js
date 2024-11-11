@@ -111,7 +111,6 @@ const handleAddOrder = async (req, res) => {
   try {
     const user_id = req.data.id;
     const {
-      employeeId,
       fullname,
       phoneNumber,
       email,
@@ -119,17 +118,13 @@ const handleAddOrder = async (req, res) => {
       products,
       note,
       id_coupon,
-      shipFee,
-      total,
     } = req.body;
     if (
       !fullname ||
       !phoneNumber ||
       !email ||
       !address ||
-      products.length === 0 ||
-      shipFee === null ||
-      total === null
+      products.length === 0
     ) {
       return res.status(400).json({
         error: 1,
@@ -143,13 +138,9 @@ const handleAddOrder = async (req, res) => {
       address,
       email,
       note,
-      shipFee,
       id_coupon,
-      total,
-      employeeId,
       products
     );
-    console.log(result);
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);

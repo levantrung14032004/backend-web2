@@ -117,10 +117,7 @@ const addOrder = (
   address,
   email,
   note,
-  shipFee,
   id_coupon,
-  total,
-  employeeId,
   products
 ) =>
   new Promise(async (resolve, reject) => {
@@ -128,11 +125,86 @@ const addOrder = (
     try {
       client = await connection.getConnection();
       await client.beginTransaction();
+      //check total price
+      const ids = [];
+      const placeholders_listProduct = products
+        .map((product) => {
+          ids.push(product.id);
+          return "?";
+        })
+        .join(",");
+      const [listProduct] = await client.query(
+        `select id, thumbnail, quantity, price from product where id in (${placeholders_listProduct})`,
+        [...ids]
+      );
+      if (listProduct.length !== products.length) {
+        resolve({
+          error: 1,
+          message: "Có sản phẩm không tồn tại",
+        });
+        return;
+      }
+      const insufficientStock = listProduct.some((product) => {
+        const stock = products.find((item) => item.id === product.id);
+        return stock.quantity > product.quantity;
+      });
+      if (insufficientStock) {
+        resolve({
+          error: 1,
+          message: "Có sản phẩm không đủ số lượng",
+        });
+        return;
+      }
+      listProduct.forEach((product) => {
+        const stock = products.find((item) => item.id === product.id);
+        product.quantity = stock.quantity;
+        product.total_price = stock.quantity * product.price;
+      });
+      const totalPrice = listProduct.reduce(
+        (acc, cur) => acc + cur.total_price,
+        0
+      );
+      let priceDiscount = 0;
+      if (id_coupon) {
+        const [coupon] = await client.query(
+          `SELECT c.discount_value FROM coupon c join coupon_for_user cu on c.id = cu.id_coupon where cu.status = 1 and c.expiration_date > now() and cu.id_user = ? and cu.id_coupon = ? and c.value_apply <= ?`,
+          [user_id, id_coupon, totalPrice]
+        );
+        if (coupon.length === 0) {
+          resolve({
+            error: 1,
+            message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+          });
+          return;
+        }
+        const [useCoupon] = await client.execute(
+          `UPDATE coupon_for_user SET status = 0 WHERE id_user = ? and id_coupon = ?`,
+          [user_id, id_coupon]
+        );
+        if (useCoupon.affectedRows === 0) {
+          resolve({
+            error: 1,
+            message: "Đặt hàng thất bại",
+          });
+          return;
+        }
+        priceDiscount =
+          totalPrice *
+          parseFloat(coupon[0].discount_value.replace("%", "")) / 100.0;
+        console.log(
+          priceDiscount,
+          parseFloat(coupon[0].discount_value.replace("%", "")/100.0)
+        );
+      }
+      const shipFee =
+        address.split(", ")[3] === "Thành phố Hồ Chí Minh" ? 15000 : 35000;
+      const total = totalPrice + shipFee - priceDiscount;
+      //add order
       const [addOrder] = await client.execute(
-        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,id_coupon, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
+        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id, fullname, phone_number, email, address, note, shipFee, id_coupon, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
         [
           user_id,
-          employeeId,
+          null,
           fullname,
           phoneNumber,
           email,
@@ -151,7 +223,7 @@ const addOrder = (
         return;
       }
       const values = [];
-      const placeholders = products
+      const placeholders_add_order_details = listProduct
         .map((product) => {
           values.push(
             addOrder.insertId,
@@ -165,9 +237,9 @@ const addOrder = (
         })
         .join(", ");
       const sql_addOrderDetail = `
-      INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status)
-      VALUES ${placeholders}
-    `;
+        INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status)
+        VALUES ${placeholders_add_order_details}
+      `;
       const [addOrderDetail] = await client.execute(sql_addOrderDetail, values);
       if (addOrderDetail.affectedRows === 0) {
         await client.rollback();
@@ -177,7 +249,7 @@ const addOrder = (
         });
         return;
       }
-      const sql_updateProduct = `UPDATE product SET quantity = CASE ${products
+      const sql_updateProduct = `UPDATE product SET quantity = CASE ${listProduct
         .map(
           (product) =>
             `WHEN id = ${product.id} THEN quantity - ${product.quantity}`
