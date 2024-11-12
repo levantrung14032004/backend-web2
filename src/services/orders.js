@@ -39,6 +39,27 @@ export const getOrderByAdmin = async () => {
   }
 };
 
+export const getOrderByAdminWithStatus = async (status) => {
+  try {
+    const [values, fields] = await connection.execute(
+      `SELECT o.id, p.title, od.num, od.price, o.total_money, o.order_date, o.status, o.employee_id, p.thumbnail, o.shipFee, o.note
+        FROM ${process.env.DATABASE_NAME}.order o
+        JOIN ${process.env.DATABASE_NAME}.order_detail od ON o.id = od.order_id
+        JOIN ${process.env.DATABASE_NAME}.product p ON p.id = od.product_id
+        WHERE o.status = ?`,
+      [status]
+    );
+    if (values) {
+      return values;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 export const getTotalWithDate = async (date) => {
   try {
     const [rows, fields] = await connection.execute(

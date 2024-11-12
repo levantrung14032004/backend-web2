@@ -61,6 +61,53 @@ export const handleGetOrderByAdmin = async (req, res) => {
   }
 };
 
+export const handleGetOrderByAdminWithStatus = async (req, res) => {
+  try {
+    const status = req.body.status;
+    const orders = await orderService.getOrderByAdminWithStatus(status);
+    if (orders) {
+      const result = orders.reduce((acc, order) => {
+        const found = acc.find((item) => item.orderId === order.id);
+        if (!found) {
+          acc.push({
+            orderId: order.id,
+            orderDate: order.order_date,
+            status: order.status,
+            total: order.total_money,
+            employeeId: order.employee_id,
+            shipFee: order.shipFee,
+            note: order.note,
+            products: [
+              {
+                productName: order.title,
+                thumbnail: order.thumbnail,
+                unitPrice: order.price,
+                quantity: order.num,
+              },
+            ],
+          });
+        } else {
+          found.products.push({
+            productName: order.title,
+            thumbnail: order.thumbnail,
+            unitPrice: order.price,
+            quantity: order.num,
+          });
+        }
+        return acc;
+      }, []);
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({
+        error: 1,
+        message: "No data found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
 export const handleGetTotalWithDate = async (req, res) => {
   try {
     const date = req.body.date;

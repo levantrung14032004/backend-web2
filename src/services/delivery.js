@@ -10,10 +10,10 @@ const getCompany = async () => {
   }
 };
 
-const insertCompany = async (name, discount, status, description) => {
+const insertCompany = async (name, discount, description) => {
   const [result, fields] = await connection.execute(
-    `insert into company_delivery(name, discount,status, description) values (?, ?, ?, ? )`,
-    [name, discount, status, description]
+    `insert into company_delivery(name, discount, description) values (?, ?, ? )`,
+    [name, discount, description]
   );
 
   if (result != null) {

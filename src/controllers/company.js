@@ -19,17 +19,16 @@ const handleGetCompany = async function (req, res) {
 const handleInsertCompany = async function (req, res) {
   let name = req.body.name;
   let discount = req.body.discount;
-  let status = req.body.status;
-  let description = req.body.description;
+  let infomation = req.body.infomation;
 
   try {
-    const result = await insertCompany(name, discount, status, description);
+    const result = await insertCompany(name, discount, infomation);
 
     if (result) {
-      res.status(200).json(result);
+      res.status(200).json({ code: 1, message: "Them thanh cong" });
     }
   } catch (error) {
-    res.status(500).error(error.message);
+    res.status(500).json(error.message);
   }
 };
 
@@ -47,9 +46,9 @@ const handleCreateReceived = async function (req, res) {
       products
     );
     if (result) {
-      res.status(200).json("Them phieu nhap thanh cong");
+      res.status(200).json({ code: 1, message: "Them thanh cong" });
     } else {
-      res.status(404).json("Co loi");
+      res.status(200).json({ code: 0, message: "Them that bai" });
     }
   } catch (error) {
     console.log(error);

@@ -28,20 +28,30 @@ const handleAddAuthor = async (req, res) => {
     const thumbnail = req.file;
 
     if (!thumbnail) {
-      return res.status(400).json("Thiếu ảnh đại diện");
+      return res
+        .status(400)
+        .json({ success: false, message: "Thiếu ảnh đại diện" });
     }
     const uploadIMG = await uploadIMG_service(thumbnail);
     if (uploadIMG.error === 1) {
-      return res.status(400).json("Lưu ảnh thất bại");
+      return res
+        .status(400)
+        .json({ success: false, message: "Lưu ảnh thất bại" });
     }
     if (!name || !information) {
-      return res.status(400).json("Thiếu thông tin");
+      return res
+        .status(400)
+        .json({ success: false, message: "Thiếu thông tin" });
     }
     const result = await addAuthor(name.trim(), uploadIMG.URL, information);
-    return res.status(200).json(result);
+    return res
+      .status(200)
+      .json({ success: true, message: "Thêm tác giả thành công" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json("Thêm tác giả thất bại");
+    return res
+      .status(500)
+      .json({ success: false, message: "Co loi tu server {catch}" });
   }
 };
 
@@ -90,9 +100,9 @@ const handleDeleteAuthor = async (req, res) => {
     const { id, status } = req.body;
     const author = await deleteAuthor(id, status);
     if (author !== null) {
-      res.status(200).json("Xoa tac gia thanh cong");
+      res.status(200).json({ code: 1, message: "Đã lưu thay đổi" });
     } else {
-      res.status(404).json("Co loi tu server");
+      res.status(200).json({ code: 0, message: "Xoa tac gia that bai" });
     }
   } catch (error) {
     console.log(error);

@@ -55,6 +55,7 @@ import upload from "../middleware/multer.js";
 import {
   handleGetDashDtoD,
   handleGetOrderByAdmin,
+  handleGetOrderByAdminWithStatus,
   handleGetOrderStatus,
   handleGetTopSelling,
   handleGetTotal1D,
@@ -70,6 +71,10 @@ import {
 } from "../controllers/adminAuth.js";
 
 import { verifyToken } from "../middleware/jwt_admin.js";
+import {
+  handleGetDiscounts,
+  handleInsertDiscount,
+} from "../controllers/discount.js";
 const routeAPI = express.Router();
 // Auth
 routeAPI.post("/auth/register", handleRegisterEmployee);
@@ -134,6 +139,11 @@ routeAPI.put(
   verifyToken,
   handleUpdateOrderStatus
 );
+routeAPI.post(
+  "/order/get-order-by-status",
+  verifyToken,
+  handleGetOrderByAdminWithStatus
+);
 routeAPI.get("/order/get-total-1d", verifyToken, handleGetTotal1D);
 routeAPI.get("/order/get-total-3d", verifyToken, handleGetTotal3D);
 routeAPI.get("/order/get-total-7d", verifyToken, handleGetTotal7D);
@@ -155,5 +165,9 @@ routeAPI.put("/author/delete", verifyToken, handleDeleteAuthor);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);
+
+// Discount
+routeAPI.get("/discount", handleGetDiscounts);
+routeAPI.post("/discount", verifyToken, handleInsertDiscount);
 
 export default routeAPI;

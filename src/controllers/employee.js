@@ -40,7 +40,7 @@ const handleDeleteEmployee = async (req, res) => {
     const value = req.query.id;
     const result = await deleteCurrentEmployee(value);
     if (result) {
-      res.status(200).json(result);
+      res.status(200).json({ code: 1, message: "Xoa thanh cong" });
     } else {
       res.status(504).error("Co loi khi tao nhan vien");
     }
@@ -55,9 +55,9 @@ const handleEditEmployee = async (req, res) => {
     const value = req.body.value;
     const result = await editCurrentEmployee(value);
     if (result) {
-      res.status(200).json(result);
+      res.status(200).json({ code: 1, message: "Đã lưu thay đổi" });
     } else {
-      res.status(504).error("Co loi khi tao nhan vien");
+      res.status(200).json({ code: 0, message: "Không thể lưu thay đổi" });
     }
   } catch (error) {
     console.error(error);

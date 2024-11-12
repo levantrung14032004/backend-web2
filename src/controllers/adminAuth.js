@@ -19,7 +19,6 @@ const generateRefreshToken = (employee) => {
 };
 
 const handleRegisterEmployee = async (req, res) => {
-  console.log(req.body);
   try {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.value.password, salt);
@@ -43,12 +42,14 @@ const handleRegisterEmployee = async (req, res) => {
         address
       );
       if (result) {
-        res.status(200).json("Đăng ký thành công");
+        res.status(200).json({ code: 1, message: "Đăng ký thành công" });
       } else {
-        res.status(400).json("Đăng ký thất bại");
+        res.status(400).json({ code: 0, message: "Đăng ký thất bại" });
       }
     } else {
-      res.status(400).json("Không được bỏ trống email hoặc mật khẩu");
+      res
+        .status(400)
+        .json({ code: 0, message: "Không được bỏ trống email hoặc mật khẩu" });
     }
   } catch (error) {
     res.status(500).json("Loi" + error);
@@ -59,7 +60,7 @@ const handleLoginEmployee = async (req, res) => {
   try {
     const employee = await findEmployeeByEmail(req.body.email);
     if (!employee) {
-      res.status(401).json({ message: "Email không tồn tại" });
+      res.status(401).json({ code: 0, message: "Email không tồn tại" });
       return;
     } else {
       const validPassword = await bcrypt.compare(
@@ -67,7 +68,7 @@ const handleLoginEmployee = async (req, res) => {
         employee[0].password
       );
       if (!validPassword) {
-        res.status(401).json({ message: "Mật khẩu không chính xác" });
+        res.status(401).json({ code: 0, message: "Mật khẩu không chính xác" });
         return;
       }
       if (employee && validPassword) {
@@ -76,9 +77,11 @@ const handleLoginEmployee = async (req, res) => {
         const refreshToken = generateRefreshToken(employeeAction);
         res.cookie("refreshToken", refreshToken, { httpOnly: true });
         await updateRefreshToken(employee[0].id, refreshToken);
-        res
-          .status(200)
-          .json({ code: 1, message: "Đăng nhập thành công", accessToken });
+        res.status(200).json({
+          success: true,
+          message: "Đăng nhập thành công",
+          accessToken,
+        });
       }
     }
   } catch (error) {
