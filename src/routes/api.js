@@ -68,6 +68,7 @@ routeAPI.use(authenticateToken);
 routeAPI.get("/cart/getCart", cart.getCart);
 routeAPI.post("/cart/addToCart", cart.addToCart);
 routeAPI.post("/cart/removeFromCart", cart.removeFromCart);
+routeAPI.delete("/cart/clearCart", cart.clearCart);
 // User
 routeAPI.get("/user/info", handleGetInfoById);
 routeAPI.put("/user/info/edit", userController.changeInfo);

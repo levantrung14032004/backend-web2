@@ -110,3 +110,24 @@ export const removeFromCart = (id_user, id_product) =>
       reject({ error: 1, message: "Xóa sản phẩm khỏi giỏ hàng thất bại" });
     }
   });
+
+export const clearCart = (id_user) => new Promise(async (resolve, reject) => {
+  try {
+    const [result] = await connection.execute(
+      "DELETE FROM cart WHERE id_user = ?",
+      [id_user]
+    );
+    resolve({
+      error: result.affectedRows === 0 ? 1 : 0,
+      message:
+        result.affectedRows === 0
+          ? "Xóa giỏ hàng thất bại"
+          : "Xóa giỏ hàng thành công",
+    });
+    const cartKey = `cart:${id_user}`;
+    await client.del(cartKey);
+  } catch (error) {
+    console.log(error);
+    reject({ error: 1, message: "Xóa giỏ hàng thất bại" });
+  }
+})
