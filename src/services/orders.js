@@ -13,7 +13,8 @@ export const getOrderByUser = (id) =>
           ...order,
           discount: order.discount
             ? (order.total_money - order.shipFee) /
-              ((100.0 - parseFloat(order.discount.replace("%", ""))) / 100)
+                ((100.0 - parseFloat(order.discount.replace("%", ""))) / 100) -
+              (order.total_money - order.shipFee)
             : 0,
           order_detail: JSON.parse(`[${order.order_detail}]`),
         };
