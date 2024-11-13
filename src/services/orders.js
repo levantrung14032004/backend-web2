@@ -5,7 +5,40 @@ export const getOrderByUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {
       const [rows, fields] = await connection.query(
-        `select o.id, o.order_date, o.status, s.name, o.total_money, o.shipFee, c.discount_value as discount, GROUP_CONCAT(distinct JSON_OBJECT('id',od.id,'name',p.title, 'thumbnail', od.thumbnail,'unitPrice',od.price,'quantity',od.num)) AS order_detail FROM ${process.env.DATABASE_NAME}.order o join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id join product p on od.product_id = p.id join orderstatus s on o.status = s.id join coupon c on c.id = o.id_coupon where o.user_id = ? and od.status = 1 GROUP BY o.id ORDER BY o.order_date DESC`,
+        `SELECT 
+    o.id, 
+    o.order_date, 
+    o.status, 
+    s.name, 
+    o.total_money, 
+    o.shipFee, 
+    c.discount_value AS discount, 
+    GROUP_CONCAT(
+        DISTINCT JSON_OBJECT(
+            'id', od.id,
+            'name', p.title, 
+            'thumbnail', od.thumbnail,
+            'unitPrice', od.price,
+            'quantity', od.num
+        )
+    ) AS order_detail 
+FROM 
+    ${process.env.DATABASE_NAME}.order o 
+JOIN 
+    ${process.env.DATABASE_NAME}.order_detail od ON o.id = od.order_id 
+JOIN 
+    product p ON od.product_id = p.id 
+JOIN 
+    orderstatus s ON o.status = s.id 
+LEFT JOIN 
+    coupon c ON o.id_coupon = c.id AND o.id_coupon IS NOT NULL 
+WHERE 
+    o.user_id = ? 
+    AND od.status = 1 
+GROUP BY 
+    o.id 
+ORDER BY 
+    o.order_date DESC`,
         [id]
       );
       const orders = rows.map((order) => {
