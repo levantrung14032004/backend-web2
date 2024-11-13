@@ -501,7 +501,7 @@ export const selectAddress = (id_user, id) =>
       }
       if (list_address.length > 1) {
         const [result] = await client.execute(
-          `update addressDetail set setdefault = 0 where id_user = ? and setdefault = 1`,
+          `update addressDetail set setdefault = '0' where id_user = ? and setdefault = '1'`,
           [id_user]
         );
         if (result.affectedRows === 0) {
@@ -514,7 +514,7 @@ export const selectAddress = (id_user, id) =>
         }
       }
       const [result2] = await client.execute(
-        `update addressDetail set setdefault = 1 where id = ? and id_user = ? `,
+        `update addressDetail set setdefault = '1' where id = ? and id_user = ? `,
         [id, id_user]
       );
       if (result2.affectedRows === 0) {
