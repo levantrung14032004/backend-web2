@@ -1,10 +1,4 @@
-import {
-  getUsers,
-  getAllOrder,
-  getInfoById,
-  editInfo,
-  addOrder,
-} from "../services/user.js";
+import { getUsers, getInfoById, editInfo, addOrder } from "../services/user.js";
 import * as userService from "../services/user.js";
 import * as regex from "../utils/regex.js";
 const handleGetAllUsers = async (req, res) => {
@@ -18,21 +12,6 @@ const handleGetAllUsers = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(501).json(error.message);
-  }
-};
-
-const handleGetAllOrder = async (req, res) => {
-  try {
-    let user_id = req.body.user_id;
-    const result = await getAllOrder(user_id);
-    if (result != null) {
-      res.status(200).json(result);
-    } else {
-      res.status(500).json("Nguoi dung khong ton tai");
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
   }
 };
 
@@ -130,18 +109,28 @@ export const changeInfo = async (req, res) => {
 };
 const handleAddOrder = async (req, res) => {
   try {
-    let user_id = req.data.id;
-    let fullname = req.body.fullname;
-    let phoneNumber = req.body.phoneNumber;
-    let address = req.body.address;
-    let email = req.body.email;
-    let note = req.body.note;
-    let shipFee = req.body.shipFee;
-    let discount = req.body.discount;
-    let total = req.body.total;
-    let employeeId = req.body.employeeId;
-    let products = req.body.products;
-
+    const user_id = req.data.id;
+    const {
+      fullname,
+      phoneNumber,
+      email,
+      address,
+      products,
+      note,
+      id_coupon,
+    } = req.body;
+    if (
+      !fullname ||
+      !phoneNumber ||
+      !email ||
+      !address ||
+      products.length === 0
+    ) {
+      return res.status(400).json({
+        error: 1,
+        message: "Thiếu thông tin",
+      });
+    }
     const result = await addOrder(
       user_id,
       fullname,
@@ -149,29 +138,17 @@ const handleAddOrder = async (req, res) => {
       address,
       email,
       note,
-      shipFee,
-      discount,
-      total,
-      employeeId,
+      id_coupon,
       products
     );
-    console.log(result);
-
-    if (result) {
-      res.status(200).json({
-        status: true,
-        message: "Đơn hàng đã được thêm thành công",
-      });
-    } else {
-      res
-        .status(500)
-        .json({ status: false, message: "Đơn hàng thêm thất bại" });
-    }
-  } catch (error) {}
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
 };
 
 export {
-  handleGetAllOrder,
   handleGetInfoById,
   handleEditInfoById,
   handleAddOrder,
@@ -395,15 +372,10 @@ export const handleCheckCoupon = async (req, res) => {
     const id = req.data.id;
     const coupon = req.body.coupon;
     const value_apply = req.body.value_apply;
+    if (!coupon || !value_apply)
+      return res.status(400).json({ error: 1, message: "Thiếu thông tin" });
     const result = await userService.checkValidCoupon(id, coupon, value_apply);
-    if (result.length > 0) {
-      res.status(200).json(result);
-    } else {
-      res.status(200).json({
-        message:
-          "Mã giảm giá đã hết hạn hoặc chưa đạt đến hạn mức áp dụng. Vui lòng kiểm tra lại!!!",
-      });
-    }
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
     res.status(500).error(error);

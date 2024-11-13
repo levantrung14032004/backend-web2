@@ -1,14 +1,15 @@
 import connection from "../database/database.js";
 
-const getCompany = async () => {
-  const [result, fields] = await connection.execute(
-    `select * from company_delivery`
-  );
-
-  if (result) {
-    return result;
-  }
-};
+const getCompany = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.query(`select * from company_delivery`);
+      resolve(result);
+    } catch (error) {
+      console.error(error);
+      reject(null);
+    }
+  });
 
 const insertCompany = async (name, discount, description) => {
   const [result, fields] = await connection.execute(

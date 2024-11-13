@@ -31,46 +31,48 @@ export const update_token_user = (
       reject(error);
     }
   });
-const getAllOrder = async (userId) => {
-  try {
-    const [result, fields] = await connection.execute(
-      `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status
-          from ${process.env.DATABASE_NAME}.order o
-          join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
-          join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
-          where o.user_id = ?;`,
-      [userId]
-    );
+// const getAllOrder = async (userId) => {
+//   try {
+//     const [result, fields] = await connection.execute(
+//       `select o.id, p.title, od.num, od.price, o.total_money,o.order_date, o.status, os.name
+//           from ${process.env.DATABASE_NAME}.order o
+//           join ${process.env.DATABASE_NAME}.order_detail od on o.id = od.order_id
+//           join ${process.env.DATABASE_NAME}.product p on p.id = od.product_id
+//           join ${process.env.DATABASE_NAME}.orderstatus os on os.id = o.status
+//           where o.user_id = ?;`,
+//       [userId]
+//     );
 
-    let orders = {};
-    result.map((order) => {
-      const order_id = order.id;
-      if (!orders.order_id) {
-        orders.order_id = {
-          orderId: order_id,
-          products: [],
-          total: order.total_money,
-          orderDate: order.order_date,
-          status: order.status,
-        };
-      }
+//     let orders = {};
+//     result.map((order) => {
+//       const order_id = order.id;
+//       if (!orders.order_id) {
+//         orders.order_id = {
+//           orderId: order_id,
+//           products: [],
+//           total: order.total_money,
+//           orderDate: order.order_date,
+//           status: order.status,
+//           statusName: order.name,
+//         };
+//       }
 
-      orders.order_id.products.push({
-        productName: order.title,
-        quantity: order.num,
-        unitPrice: order.price,
-      });
-    });
-    if (orders.order_id) {
-      return orders.order_id;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+//       orders.order_id.products.push({
+//         productName: order.title,
+//         quantity: order.num,
+//         unitPrice: order.price,
+//       });
+//     });
+//     if (orders.order_id) {
+//       return orders.order_id;
+//     } else {
+//       return null;
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// };
 
 const getInfoById = async (id) => {
   try {
@@ -108,79 +110,180 @@ const editInfo = (firstName, lastName, fullName, id) =>
     }
   });
 
-const addOrder = async (
+const addOrder = (
   user_id,
   fullname,
   phoneNumber,
   address,
   email,
   note,
-  shipFee,
-  discount,
-  total,
-  employeeId,
+  id_coupon,
   products
-) => {
-  try {
-    await connection.execute(
-      `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id,fullname, phone_number, email, address, note, shipFee,discount, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),2)`,
-      [
-        user_id,
-        employeeId,
-        fullname,
-        phoneNumber,
-        email,
-        address,
-        note,
-        shipFee,
-        discount,
-        total,
-      ]
-    );
-    const [lastId, another] = await connection.query(
-      `SELECT id FROM ${process.env.DATABASE_NAME}.order ORDER BY id DESC LIMIT 1;`
-    );
-
-    const productsInOrder = products;
-    productsInOrder.forEach(async (product) => {
-      let productId = product.id;
-      let productPrice = product.price;
-      let productQuantity = product.quantity;
-      let productTotal = product.total_price;
-      let productThumbnail = product.thumbnail;
-
-      await connection.execute(
-        `INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status) VALUES (?, ?, ?, ?, ?, ?, 1)`,
+) =>
+  new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      //check total price
+      const ids = [];
+      const placeholders_listProduct = products
+        .map((product) => {
+          ids.push(product.id);
+          return "?";
+        })
+        .join(",");
+      const [listProduct] = await client.query(
+        `select id, thumbnail, quantity, price from product where id in (${placeholders_listProduct})`,
+        [...ids]
+      );
+      if (listProduct.length !== products.length) {
+        resolve({
+          error: 1,
+          message: "Có sản phẩm không tồn tại",
+        });
+        return;
+      }
+      const insufficientStock = listProduct.some((product) => {
+        const stock = products.find((item) => item.id === product.id);
+        return stock.quantity > product.quantity;
+      });
+      if (insufficientStock) {
+        resolve({
+          error: 1,
+          message: "Có sản phẩm không đủ số lượng",
+        });
+        return;
+      }
+      listProduct.forEach((product) => {
+        const stock = products.find((item) => item.id === product.id);
+        product.quantity = stock.quantity;
+        product.total_price = stock.quantity * product.price;
+      });
+      const totalPrice = listProduct.reduce(
+        (acc, cur) => acc + cur.total_price,
+        0
+      );
+      let priceDiscount = 0;
+      if (id_coupon) {
+        const [coupon] = await client.query(
+          `SELECT c.discount_value FROM coupon c join coupon_for_user cu on c.id = cu.id_coupon where cu.status = 1 and c.expiration_date > now() and cu.id_user = ? and cu.id_coupon = ? and c.value_apply <= ?`,
+          [user_id, id_coupon, totalPrice]
+        );
+        if (coupon.length === 0) {
+          resolve({
+            error: 1,
+            message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+          });
+          return;
+        }
+        const [useCoupon] = await client.execute(
+          `UPDATE coupon_for_user SET status = 0 WHERE id_user = ? and id_coupon = ?`,
+          [user_id, id_coupon]
+        );
+        if (useCoupon.affectedRows === 0) {
+          resolve({
+            error: 1,
+            message: "Đặt hàng thất bại",
+          });
+          return;
+        }
+        priceDiscount =
+          totalPrice *
+          parseFloat(coupon[0].discount_value.replace("%", "")) / 100.0;
+        console.log(
+          priceDiscount,
+          parseFloat(coupon[0].discount_value.replace("%", "")/100.0)
+        );
+      }
+      const shipFee =
+        address.split(", ")[3] === "Thành phố Hồ Chí Minh" ? 15000 : 35000;
+      const total = totalPrice + shipFee - priceDiscount;
+      //add order
+      const [addOrder] = await client.execute(
+        `INSERT INTO ${process.env.DATABASE_NAME}.order (user_id, employee_id, fullname, phone_number, email, address, note, shipFee, id_coupon, total_money, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,?, NOW(),1)`,
         [
-          lastId[0].id,
-          productId,
-          productPrice,
-          productQuantity,
-          productTotal,
-          productThumbnail,
+          user_id,
+          null,
+          fullname,
+          phoneNumber,
+          email,
+          address,
+          note,
+          shipFee,
+          id_coupon,
+          total,
         ]
       );
+      if (addOrder.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      const values = [];
+      const placeholders_add_order_details = listProduct
+        .map((product) => {
+          values.push(
+            addOrder.insertId,
+            product.id,
+            product.price,
+            product.quantity,
+            product.total_price,
+            product.thumbnail
+          );
+          return "(?, ?, ?, ?, ?, ?, 1)";
+        })
+        .join(", ");
+      const sql_addOrderDetail = `
+        INSERT INTO order_detail (order_id, product_id, price, num, total_money, thumbnail, status)
+        VALUES ${placeholders_add_order_details}
+      `;
+      const [addOrderDetail] = await client.execute(sql_addOrderDetail, values);
+      if (addOrderDetail.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      const sql_updateProduct = `UPDATE product SET quantity = CASE ${listProduct
+        .map(
+          (product) =>
+            `WHEN id = ${product.id} THEN quantity - ${product.quantity}`
+        )
+        .join(" ")} ELSE quantity END WHERE id IN (${products
+        .map((product) => `${product.id}`)
+        .join(",")});`;
+      const [updateProduct] = await client.execute(sql_updateProduct);
+      if (updateProduct.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
+      await client.commit();
+      resolve({
+        error: 0,
+        message: "Đặt hàng thành công",
+      });
+    } catch (error) {
+      console.log(error);
+      await client.rollback();
+      reject({
+        error: 1,
+        message: "Đặt hàng thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
 
-      await connection.execute(
-        `UPDATE product SET quantity = quantity - ? WHERE id = ?`,
-        [productQuantity, productId]
-      );
-    });
-
-    await connection.execute(
-      `update user 
-    set fullname = ?, address = ?, phone_number = ? 
-    where id = ?`,
-      [fullname, address, phoneNumber, user_id]
-    );
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
-
-export { getUsers, getAllOrder, getInfoById, editInfo, addOrder };
+export { getUsers, getInfoById, editInfo, addOrder };
 
 export const get_publicKey_accessToken = (id) =>
   new Promise(async (resolve, reject) => {
@@ -646,22 +749,33 @@ export const getCouponUser = (id) =>
     }
   });
 
-export const checkValidCoupon = async (id, coupon, value_apply) => {
-  try {
-    const [result] =
-      await connection.execute(`select c.discount_value from coupon_for_user cf join coupon c on cf.id_coupon = c.id
-where cf.id_user = ${id} and c.coupon_code = "${coupon}" and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ${value_apply}`);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
+export const checkValidCoupon = (id, coupon, value_apply) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        `select c.discount_value, c.id from coupon_for_user cf join coupon c on cf.id_coupon = c.id
+where cf.id_user = ? and c.coupon_code = ? and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ?`,
+        [id, coupon, value_apply]
+      );
+      resolve({
+        error: result.length === 0 ? 1 : 0,
+        message:
+          result.length === 0
+            ? "Mã giảm giá đã hết hạn hoặc chưa đạt đến hạn mức áp dụng. Vui lòng kiểm tra lại!!!"
+            : "Áp dụng mã giảm giá thành công",
+        discount_value: result.length === 0 ? null : result[0].discount_value,
+        id: result.length === 0 ? null : result[0].id,
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: "Áp dụng mã giảm giá thất bại",
+        discount_value: null,
+        id: null,
+      });
     }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+  });
 
 export const changeStatusUser = async (id, status) => {
   try {
@@ -675,3 +789,23 @@ export const changeStatusUser = async (id, status) => {
     return null;
   }
 };
+export const get_publicKey_refreshTokenByRefreshToken = (refresh_token) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.query(
+        `SELECT publicKey_RefreshToken FROM user WHERE RefreshToken = ?`,
+        [refresh_token]
+      );
+      const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
+      resolve({
+        error: publicKey_RefreshToken ? 0 : 1,
+        publicKey_RefreshToken: publicKey_RefreshToken || null,
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        publicKey_RefreshToken: null,
+      });
+    }
+  });

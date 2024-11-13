@@ -16,7 +16,7 @@ export const getProduct = () =>
       LEFT JOIN 
         gallery g ON p.id = g.product_id
       WHERE 
-        p.status = 1 and c.status = 1 and g.status = 1
+        p.status = 1 and c.status = 1 and g.status = 1 and p.quantity > 0
       GROUP BY 
         p.id
       ORDER BY 

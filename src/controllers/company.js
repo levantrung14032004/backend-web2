@@ -6,14 +6,12 @@ import {
 } from "../services/delivery.js";
 import moment from "moment";
 
-const handleGetCompany = async function (req, res) {
+const handleGetCompany = async (req, res) => {
   try {
     const result = await getCompany();
-    if (result) {
-      res.status(200).json(result);
-    }
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).error(error.message);
+    return res.status(500).error(error.message);
   }
 };
 const handleInsertCompany = async function (req, res) {

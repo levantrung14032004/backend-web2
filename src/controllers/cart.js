@@ -59,3 +59,16 @@ export const removeFromCart = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const clearCart = async (req, res) => {
+  try {
+    const id_user = req.data.id;
+    if (!id_user) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const response = await cartService.clearCart(id_user);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}

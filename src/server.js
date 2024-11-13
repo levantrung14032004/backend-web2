@@ -31,8 +31,8 @@ app.use(
 app.use(
   session({
     secret: create_secret_key(),
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,

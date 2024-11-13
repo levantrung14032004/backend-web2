@@ -53,7 +53,7 @@ const addAuthor = (name, thumbnail, information) =>
 const updateAuthor = async (id, name, infomation, thumbnail) => {
   try {
     const [result, fields] = await connection.execute(
-      "update author set name = ?, thumbnail = ?, infomation = ? where id = ?",
+      "update author set name = ?, thumbnail = ?, information = ? where id = ?",
       [name, thumbnail, infomation, id]
     );
     if (result.affectedRows) return true;

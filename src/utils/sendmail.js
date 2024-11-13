@@ -51,3 +51,47 @@ Have a nice day !!!!`,
     return null;
   }
 };
+
+export const sendNewPassword = async (toEmail, newPassword) => {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken.token,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Comicola"<' + process.env.EMAIL + ">",
+      to: toEmail,
+      subject: "Thư được gửi từ cửa hàng sách Comicola",
+      text: `Hello ${toEmail},
+
+Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại Comicola.
+
+Mật khẩu mới của bạn là: ${newPassword}
+
+Vui lòng đăng nhập bằng mật khẩu mới này và thay đổi mật khẩu của bạn ngay sau khi đăng nhập để đảm bảo an toàn cho tài khoản của bạn.
+
+Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng liên hệ với chúng tôi ngay lập tức để bảo vệ tài khoản của bạn.
+
+Chúc bạn một ngày tốt lành!
+
+Trân trọng,
+Đội ngũ hỗ trợ Comicola`,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return null;
+  }
+};
