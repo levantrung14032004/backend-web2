@@ -110,15 +110,8 @@ export const changeInfo = async (req, res) => {
 const handleAddOrder = async (req, res) => {
   try {
     const user_id = req.data.id;
-    const {
-      fullname,
-      phoneNumber,
-      email,
-      address,
-      products,
-      note,
-      id_coupon,
-    } = req.body;
+    const { fullname, phoneNumber, email, address, products, note, id_coupon } =
+      req.body;
     if (
       !fullname ||
       !phoneNumber ||
@@ -217,7 +210,7 @@ export const handleSelectAddress = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    return res.status(500).error(error);
+    return res.status(500).json(error);
   }
 };
 export const handleAddAddress = async (req, res) => {

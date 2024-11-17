@@ -297,3 +297,59 @@ export const getProductByCategory = (id) =>
       });
     }
   });
+
+export const updateProduct = async (product) => {
+  let done = false;
+  try {
+    await connection.execute(
+      `UPDATE product SET title = ?, description = ?, introduce = ? WHERE id = ?`,
+      [product.title, product.description, product.introduce, product.productId]
+    );
+
+    if (product.categoryAdd.length > 0) {
+      product.categoryAdd.forEach(async (id_Category) => {
+        await connection.execute(
+          `INSERT INTO product_category (id_Product, id_Category) VALUES (?, ?)`,
+          [product.productId, id_Category]
+        );
+      });
+    }
+
+    if (product.categoryRemove.length > 0) {
+      product.categoryRemove.forEach(async (id_Category) => {
+        await connection.execute(
+          `DELETE FROM product_category WHERE id_Product = ? AND id_Category = ?`,
+          [product.productId, id_Category]
+        );
+      });
+    }
+
+    if (product.imagesDelete.length > 0) {
+      product.imagesDelete.forEach(async (imageURL) => {
+        await connection.execute(
+          `delete from gallery where product_id = ? and thumbnail = ?`,
+          [product.productId, imageURL]
+        );
+      });
+    }
+    done = true;
+
+    if (done) {
+      return {
+        error: 0,
+        message: "success",
+      };
+    } else {
+      return {
+        error: 1,
+        message: "error",
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      error: 1,
+      message: error,
+    };
+  }
+};

@@ -1,4 +1,11 @@
-import { getDiscounts, insertDiscount } from "../services/discount.js";
+import {
+  getDiscounts,
+  insertDiscount,
+  getAllUserWithAmount,
+  getUserAmountMinMax,
+  dropDiscount,
+  finishDrpoDiscount,
+} from "../services/discount.js";
 
 export const handleGetDiscounts = async (req, res) => {
   try {
@@ -26,5 +33,58 @@ export const handleInsertDiscount = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const handleGetAllUserWithAmount = async (req, res) => {
+  try {
+    const result = await getAllUserWithAmount();
+    if (result) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Lấy dữ liệu thành công", data: result });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
+export const handleGetUserAmountMinMax = async (req, res) => {
+  try {
+    const { min, max } = req.body;
+    const result = await getUserAmountMinMax(min, max);
+    if (result) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Lấy dữ liệu thành công", data: result });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
+export const handleDropDiscount = async (req, res) => {
+  try {
+    const { id_user, id_discount } = req.body;
+    if (id_user.length > 0) {
+      id_user.forEach(async (user_id) => {
+        await dropDiscount(user_id, id_discount);
+      });
+      await finishDrpoDiscount(id_discount);
+      res.status(200).json({
+        code: 1,
+        message: "Thêm mã giảm giá thành công",
+      });
+    } else {
+      res.status(200).json({
+        code: -1,
+        message: "Thiếu thông tin",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
   }
 };

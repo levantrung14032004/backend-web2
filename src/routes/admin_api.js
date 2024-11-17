@@ -72,7 +72,10 @@ import {
 
 import { verifyToken } from "../middleware/jwt_admin.js";
 import {
+  handleDropDiscount,
+  handleGetAllUserWithAmount,
   handleGetDiscounts,
+  handleGetUserAmountMinMax,
   handleInsertDiscount,
 } from "../controllers/discount.js";
 const routeAPI = express.Router();
@@ -104,6 +107,12 @@ routeAPI.post(
   verifyToken,
   upload.array("product", 5),
   products.add_product
+);
+routeAPI.put(
+  "/product/update-product",
+  verifyToken,
+  upload.array("product", 2),
+  products.handleUpdateProduct
 );
 
 //Category
@@ -169,5 +178,12 @@ routeAPI.get("/received", handleGetGoodsReceived);
 // Discount
 routeAPI.get("/discount", handleGetDiscounts);
 routeAPI.post("/discount", verifyToken, handleInsertDiscount);
+routeAPI.get(
+  "/discount-all-user-amount",
+  verifyToken,
+  handleGetAllUserWithAmount
+);
+routeAPI.post("/discount-max-min", verifyToken, handleGetUserAmountMinMax);
+routeAPI.post("/drop-discount", verifyToken, handleDropDiscount);
 
 export default routeAPI;

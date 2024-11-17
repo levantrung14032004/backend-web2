@@ -68,7 +68,7 @@ const handleLoginEmployee = async (req, res) => {
         employee[0].password
       );
       if (!validPassword) {
-        res.status(401).json({ code: 0, message: "Mật khẩu không chính xác" });
+        res.status(200).json({ code: 0, message: "Mật khẩu không chính xác" });
         return;
       }
       if (employee && validPassword) {
@@ -78,7 +78,7 @@ const handleLoginEmployee = async (req, res) => {
         res.cookie("refreshToken", refreshToken, { httpOnly: true });
         await updateRefreshToken(employee[0].id, refreshToken);
         res.status(200).json({
-          success: true,
+          code: 1,
           message: "Đăng nhập thành công",
           accessToken,
         });

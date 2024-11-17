@@ -192,3 +192,45 @@ export const getProductByCategory = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+export const handleUpdateProduct = async (req, res) => {
+  try {
+    const files = req.files;
+    if (!files) {
+      return res.status(400).json("Missing image");
+    }
+    const uploadPromises = files.map((file) => uploadIMG_service(file));
+    const url_images = await Promise.all(uploadPromises);
+    //add product
+    const categoryAdd = JSON.parse(req.body.categoryAdd);
+    const categoryRemove = JSON.parse(req.body.categoryRemove);
+    const title = req.body.name;
+    const description = req.body.description;
+    const introduce = req.body.introduce;
+    const imagesDelete = JSON.parse(req.body.imagesDelete);
+    const productId = req.body.productId;
+
+    const result = await productService.updateProduct({
+      url_images,
+      categoryAdd,
+      categoryRemove,
+      title,
+      description,
+      introduce,
+      imagesDelete,
+      productId,
+    });
+    const add_thumbnail = url_images.map((url_image) =>
+      gallery.add_thumbnail(productId, url_image.URL)
+    );
+    await Promise.all(add_thumbnail);
+
+    if (result) {
+      res.status(200).json({ code: 1, message: "Update thanh cong" });
+    } else {
+      res.status(500).json({ code: 1, message: "LOI KHI UPDATE" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: 1, message: "LOI KHI UPDATE" });
+  }
+};
