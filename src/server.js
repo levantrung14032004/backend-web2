@@ -49,6 +49,11 @@ io.on("connection", (socket) => {
     console.error(`Socket error from ${socket.id}:`, err);
   });
 
+  socket.on("newOrder", () => {
+    console.log("New order");
+    io.emit("newOrderResponse");
+  });
+
   socket.on("userMessage", (message) => {
     try {
       console.log("Received message from user:", message);

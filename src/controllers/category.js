@@ -51,3 +51,54 @@ export const getAllCategory = async (req, res) => {
     return res.status(500).json({ message: "error" });
   }
 };
+
+export const handleInsertCategory = async (req, res) => {
+  try {
+    const name = req.body.name;
+    if (!name) {
+      return res.status(400).json("Missing required parameter: name");
+    }
+    const result = await categoryService.insertCategory(name);
+    return res
+      .status(200)
+      .json({ code: 1, message: "Insert category success" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+export const handleDeleteCategory = async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json("Missing required parameter: id");
+    }
+    const result = await categoryService.deleteCategory(id);
+    return res
+      .status(200)
+      .json({ code: 1, message: "Delete category success" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+export const handleUpdateCategory = async (req, res) => {
+  try {
+    const { id, name } = req.body;
+    if (!id) {
+      return res.status(400).json("Missing required parameter: id");
+    }
+    if (!name) {
+      return res.status(400).json("Missing required parameter: name");
+    }
+    const result = await categoryService.updateCategory(id, name);
+    return res
+      .status(200)
+      .json({ code: 1, message: "Update category success" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};

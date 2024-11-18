@@ -16,8 +16,8 @@ export const insertDiscount = async (discount) => {
   try {
     await connection.query(
       `
-        INSERT INTO coupon (coupon_code, discount_value, expiration_date, value_apply, max_apply)
-        VALUES (?, ?, ?, ?,?);
+        INSERT INTO coupon (coupon_code, discount_value,created_date, expiration_date, value_apply, max_apply)
+        VALUES (?, ?,NOW(), ?, ?,?);
     `,
       [
         discount.coupon_code,
@@ -47,7 +47,7 @@ export const updateDiscount = async (discount) => {
         discount.expiration_date,
         discount.value_apply,
         discount.max_apply,
-        discount.id,
+        discount.discount_id,
       ]
     );
     return true;

@@ -31,7 +31,10 @@ import {
   handleEditEmployee,
 } from "../controllers/employee.js";
 
-import { handleGetGoodsReceived } from "../controllers/received.js";
+import {
+  handleGetDetailGoodsReceived,
+  handleGetGoodsReceived,
+} from "../controllers/received.js";
 
 import {
   handleGetActionView,
@@ -77,6 +80,7 @@ import {
   handleGetDiscounts,
   handleGetUserAmountMinMax,
   handleInsertDiscount,
+  handleUpdateDiscount,
 } from "../controllers/discount.js";
 const routeAPI = express.Router();
 // Auth
@@ -118,6 +122,9 @@ routeAPI.put(
 //Category
 routeAPI.get("/category", category.getAllCategory);
 routeAPI.get("/all-category", category.getAllCategory);
+routeAPI.post("/category", verifyToken, category.handleInsertCategory);
+routeAPI.put("/category/update", verifyToken, category.handleUpdateCategory);
+routeAPI.put("/category/delete", verifyToken, category.handleDeleteCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
@@ -174,10 +181,12 @@ routeAPI.put("/author/delete", verifyToken, handleDeleteAuthor);
 
 // received
 routeAPI.get("/received", handleGetGoodsReceived);
+routeAPI.get("/received-detail", handleGetDetailGoodsReceived);
 
 // Discount
 routeAPI.get("/discount", handleGetDiscounts);
 routeAPI.post("/discount", verifyToken, handleInsertDiscount);
+routeAPI.put("/discount", verifyToken, handleUpdateDiscount);
 routeAPI.get(
   "/discount-all-user-amount",
   verifyToken,

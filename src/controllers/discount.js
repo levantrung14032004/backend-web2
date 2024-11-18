@@ -4,6 +4,7 @@ import {
   getAllUserWithAmount,
   getUserAmountMinMax,
   dropDiscount,
+  updateDiscount,
   finishDrpoDiscount,
 } from "../services/discount.js";
 
@@ -86,5 +87,25 @@ export const handleDropDiscount = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
+export const handleUpdateDiscount = async (req, res) => {
+  try {
+    const discount = req.body;
+    const result = await updateDiscount(discount);
+    if (result) {
+      res.status(200).json({
+        code: 1,
+        message: "Cập nhật mã giảm giá thành công",
+      });
+    } else {
+      res.status(200).json({
+        code: -1,
+        message: "Thiếu thông tin",
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };

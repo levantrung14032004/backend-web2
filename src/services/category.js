@@ -56,7 +56,7 @@ export const getAllCategory = () =>
   new Promise(async (resolve, reject) => {
     try {
       const [rows, fields] = await connection.query(
-        "SELECT name as label, id as value from category where status = 1"
+        "SELECT name as label, id as value, status from category where status = 1"
       );
       resolve(rows);
     } catch (error) {
@@ -67,3 +67,57 @@ export const getAllCategory = () =>
       });
     }
   });
+
+export const insertCategory = (name) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(
+        "INSERT INTO category (name, status) VALUES (?,1)",
+        [name]
+      );
+      resolve(rows);
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
+  });
+};
+
+export const deleteCategory = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(
+        "UPDATE category SET status = 0 WHERE id = ?",
+        [id]
+      );
+      resolve(rows);
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
+  });
+};
+
+export const updateCategory = (id, name) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(
+        "UPDATE category SET name = ? WHERE id = ?",
+        [name, id]
+      );
+      resolve(rows);
+    } catch (error) {
+      console.log(error);
+      reject({
+        error: 1,
+        message: error,
+      });
+    }
+  });
+};
