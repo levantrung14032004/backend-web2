@@ -189,17 +189,8 @@ const addOrder = (
           return;
         }
         priceDiscount =
-<<<<<<< HEAD
-          totalPrice *
-          parseFloat(coupon[0].discount_value.replace("%", "")) / 100.0;
-=======
           (totalPrice * parseFloat(coupon[0].discount_value.replace("%", ""))) /
           100.0;
-        console.log(
-          priceDiscount,
-          parseFloat(coupon[0].discount_value.replace("%", "") / 100.0)
-        );
->>>>>>> ffc7eac60e4210e5bf04bf0756c3e728aabae547
       }
       const shipFee =
         address.split(", ")[3] === "Thành phố Hồ Chí Minh" ? 15000 : 35000;
