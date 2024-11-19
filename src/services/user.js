@@ -167,8 +167,8 @@ const addOrder = (
       let priceDiscount = 0;
       if (id_coupon) {
         const [coupon] = await client.query(
-          `SELECT c.discount_value FROM coupon c join coupon_for_user cu on c.id = cu.id_coupon where cu.status = 1 and c.expiration_date > now() and cu.id_user = ? and cu.id_coupon = ? and c.value_apply <= ?`,
-          [user_id, id_coupon, totalPrice]
+          `SELECT c.discount_value FROM coupon c join coupon_for_user cu on c.id = cu.id_coupon where cu.status = 1 and c.expiration_date > now() and cu.id_user = ? and cu.id_coupon = ? and c.value_apply <= ? and c.max_apply >= ?`,
+          [user_id, id_coupon, totalPrice, totalPrice]
         );
         if (coupon.length === 0) {
           resolve({
@@ -191,10 +191,6 @@ const addOrder = (
         priceDiscount =
           totalPrice *
           parseFloat(coupon[0].discount_value.replace("%", "")) / 100.0;
-        console.log(
-          priceDiscount,
-          parseFloat(coupon[0].discount_value.replace("%", "")/100.0)
-        );
       }
       const shipFee =
         address.split(", ")[3] === "Thành phố Hồ Chí Minh" ? 15000 : 35000;
@@ -729,7 +725,7 @@ export const getCouponUser = (id) =>
   new Promise(async (resolve, reject) => {
     try {
       const [coupon_for_user] = await connection.query(
-        `select c.coupon_code, c.discount_value, c.created_date, c.expiration_date, c.value_apply
+        `select c.coupon_code, c.discount_value, c.created_date, c.expiration_date, c.value_apply, c.max_apply
       from coupon_for_user cf 
       join coupon c on c.id = cf.id_coupon 
       where id_user = ? and status = 1 and c.expiration_date > NOW()`,
@@ -754,8 +750,8 @@ export const checkValidCoupon = (id, coupon, value_apply) =>
     try {
       const [result] = await connection.execute(
         `select c.discount_value, c.id from coupon_for_user cf join coupon c on cf.id_coupon = c.id
-where cf.id_user = ? and c.coupon_code = ? and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ?`,
-        [id, coupon, value_apply]
+where cf.id_user = ? and c.coupon_code = ? and cf.status = 1 and c.expiration_date > NOW() and c.value_apply <= ? and c.max_apply >= ?`,
+        [id, coupon, value_apply, value_apply]
       );
       resolve({
         error: result.length === 0 ? 1 : 0,
