@@ -45,6 +45,9 @@ export const handleGetOrderByAdmin = async (req, res) => {
             employeeId: order.employee_id,
             shipFee: order.shipFee,
             note: order.note,
+            phone_number: order.phone_number,
+            address: order.address,
+            fullname: order.fullname,
             products: [
               {
                 productName: order.title,

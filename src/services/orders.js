@@ -62,10 +62,12 @@ ORDER BY
 export const getOrderByAdmin = async () => {
   try {
     const [values, fields] =
-      await connection.execute(`SELECT o.id, p.title, od.num, od.price, o.total_money, o.order_date, o.status, o.employee_id, p.thumbnail, o.shipFee, o.note
+      await connection.execute(`SELECT o.id,o.address, o.phone_number, o.fullname, p.title, od.num, od.price, o.total_money, o.order_date, o.status, o.employee_id, p.thumbnail, o.shipFee, o.note
         FROM ${process.env.DATABASE_NAME}.order o
         JOIN ${process.env.DATABASE_NAME}.order_detail od ON o.id = od.order_id
-        JOIN ${process.env.DATABASE_NAME}.product p ON p.id = od.product_id`);
+        JOIN ${process.env.DATABASE_NAME}.product p ON p.id = od.product_id
+        
+        order by o.order_date desc`);
     if (values) {
       return values;
     } else {

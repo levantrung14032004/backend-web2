@@ -145,10 +145,10 @@ routeAPI.put("/user/change-status", verifyToken, handleChangeStatusUser);
 routeAPI.post("/user/add_order", handleAddOrder);
 
 // Admin Order
-routeAPI.post("/order/totalDate", handleGetTotalWithDate);
+routeAPI.post("/order/totalDate", verifyToken, handleGetTotalWithDate);
 routeAPI.get("/order/top-selling", verifyToken, handleGetTopSelling);
 routeAPI.post("/order/date-to-date", verifyToken, handleGetDashDtoD);
-routeAPI.get("/order/get-all-order-admin", handleGetOrderByAdmin);
+routeAPI.get("/order/get-all-order-admin", verifyToken, handleGetOrderByAdmin);
 routeAPI.get("/order/get-order-status", verifyToken, handleGetOrderStatus);
 routeAPI.put(
   "/order/update-order-status",

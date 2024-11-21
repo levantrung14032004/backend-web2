@@ -107,7 +107,7 @@ export const add_product = async (req, res) => {
     const add_thumbnail_response = await Promise.all(add_thumbnail);
 
     res.status(200).json({
-      success: true,
+      code: 1,
       message: "Add product success",
     });
   } catch (error) {
