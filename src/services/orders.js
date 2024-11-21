@@ -1,5 +1,6 @@
 import connection from "../database/database.js";
 import dot from "dotenv";
+import { sendOrderStatusInfo } from "../utils/sendmail.js";
 dot.config();
 export const getOrderByUser = (id) =>
   new Promise(async (resolve, reject) => {
@@ -238,23 +239,53 @@ export const getRevenueAndOrderSeven = async () => {
 };
 export const cancelOrder = (id, userId) =>
   new Promise(async (resolve, reject) => {
+    let client;
     try {
-      const [rows, fields] = await connection.query(
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [rows, fields] = await client.execute(
         `UPDATE ${process.env.DATABASE_NAME}.order SET status = 8 WHERE id = ? and status = 1 and user_id = ?`,
         [id, userId]
       );
+      if (rows.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Hủy đơn hàng thất bại",
+        });
+        await client.rollback();
+        return;
+      }
+      const [email] = await client.query(
+        `SELECT email FROM ${process.env.DATABASE_NAME}.order WHERE id = ?`,
+        [id]
+      );
+      if (email.length === 0) {
+        resolve({
+          error: 1,
+          message: "Hủy đơn hàng thất bại",
+        });
+        await client.rollback();
+        return;
+      }
+      const sendMail = await sendOrderStatusInfo(
+        email[0].email,
+        "Đã hủy, do người dùng hủy",
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+      );
+      console.log(sendMail);
       resolve({
-        error: rows.affectedRows === 0 ? 1 : 0,
-        message:
-          rows.affectedRows === 0
-            ? "Hủy đơn hàng thất bại"
-            : "Hủy đơn hàng thành công",
+        error: 0,
+        message: "Hủy đơn hàng thành công",
       });
+      await client.commit();
     } catch (error) {
       console.log(error);
+      await client.rollback();
       reject({
         error: 1,
         message: "Hủy đơn hàng thất bại",
       });
+    } finally {
+      if (client) client.release();
     }
   });

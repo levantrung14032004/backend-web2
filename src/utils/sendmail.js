@@ -95,3 +95,43 @@ Trân trọng,
     return null;
   }
 };
+export const sendOrderStatusInfo = async (toEmail, nameStatus, date) => {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken.token,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Comicola"<' + process.env.EMAIL + ">",
+      to: toEmail,
+      subject: "Thông báo trạng thái đơn hàng từ cửa hàng sách Comicola",
+      text: `Xin chào ${toEmail},
+
+Chúng tôi xin thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+      
+Trạng thái mới: ${nameStatus}
+Ngày cập nhật: ${date}
+      
+Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ với chúng tôi qua email này.
+      
+Trân trọng,
+Comicola Team
+      `,
+    };
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return null;
+  }
+};
