@@ -262,6 +262,18 @@ const addOrder = (
         });
         return;
       }
+      const [updateStatusOrder] = await client.execute(
+        `insert into ordertracking (id_order, id_status, time) values (?, 1, now())`,
+        [addOrder.insertId]
+      );
+      if (updateStatusOrder.affectedRows === 0) {
+        await client.rollback();
+        resolve({
+          error: 1,
+          message: "Đặt hàng thất bại",
+        });
+        return;
+      }
       await client.commit();
       resolve({
         error: 0,
