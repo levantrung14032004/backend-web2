@@ -1,4 +1,6 @@
+import { time } from "console";
 import * as orderService from "../services/orders.js";
+import { name } from "ejs";
 export const getOrderByUser = async (req, res) => {
   try {
     const id = req.data.id;
@@ -229,6 +231,42 @@ export const handleGetTotal7D = async (req, res) => {
   try {
     const total = await orderService.getRevenueAndOrderSeven();
     res.status(200).json(total);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const handleGetTrackingOrder = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tracking = await orderService.getTrackingOrder(id);
+    const result = tracking.reduce((acc, item) => {
+      if (!acc.name_user) {
+        acc = {
+          id_order: item.id_order,
+          name_user: item.name_user,
+          phone_number: item.phone_number,
+          address: item.address,
+          trackings: [],
+        };
+      } else {
+        acc.trackings.push({
+          id_status: item.id_status,
+          name_employee: item.name_employee,
+          name_status: item.name,
+          time: item.time,
+        });
+      }
+      return acc;
+    }, {});
+    if (result) {
+      res.status(200).json({ code: 1, message: "Success", data: result });
+    } else {
+      res.status(404).json({
+        error: 1,
+        message: "No data found",
+      });
+    }
   } catch (error) {
     res.status(500).json(error);
   }

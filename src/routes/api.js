@@ -87,6 +87,8 @@ routeAPI.post("/user/check-coupon", userController.handleCheckCoupon);
 
 routeAPI.post("/user/order/add", handleAddOrder);
 
+routeAPI.get("/user/tracking-order/:id", order.handleGetTrackingOrder);
+
 // Goods
 routeAPI.post("/create-received", handleCreateReceived);
 

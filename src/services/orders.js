@@ -258,3 +258,25 @@ export const cancelOrder = (id, userId) =>
       });
     }
   });
+
+export const getTrackingOrder = async (id) => {
+  try {
+    const [result] =
+      await connection.execute(`select ot.*, os.name, e.fullname as name_employee, o.fullname as name_user, o.phone_number, o.address 
+                                from ordertracking ot 
+                                join orderstatus os 
+                                on os.id = ot.id_status  
+                                left join employee e
+                                on e.id = ot.update_by
+                                join ${process.env.DATABASE_NAME}.order o
+                                on o.id = ot.id_order
+                                where id_order = ${id} 
+                                order by time desc`);
+    if (result) {
+      return result;
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
