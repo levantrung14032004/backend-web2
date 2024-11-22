@@ -1,6 +1,7 @@
 import connection from "../database/database.js";
 import dot from "dotenv";
 import { sendOrderStatusInfo } from "../utils/sendmail.js";
+
 dot.config();
 export const getOrderByUser = (id) =>
   new Promise(async (resolve, reject) => {
@@ -168,18 +169,68 @@ export const getOrderStatus = async () => {
   }
 };
 
-export const updateOrderStatus = async (id, employee_id, status) => {
-  try {
-    const [rows, fields] = await connection.execute(
-      `UPDATE ${process.env.DATABASE_NAME}.order SET status = ?, employee_id = ? WHERE id = ?`,
-      [status, employee_id, id]
-    );
-    return rows;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+export const updateOrderStatus = (id, employee_id, id_status) =>
+  new Promise(async (resolve, reject) => {
+    let client;
+    try {
+      client = await connection.getConnection();
+      await client.beginTransaction();
+      const [rows, fields] = await client.execute(
+        `UPDATE ${process.env.DATABASE_NAME}.order SET status = ?, employee_id = ? WHERE id = ?`,
+        [id_status, employee_id, id]
+      );
+      if (rows.affectedRows === 0) {
+        resolve({
+          success: false,
+          message: "Cập nhật trạng thái đơn hàng thất bại",
+        });
+        await client.rollback();
+        return;
+      }
+      const [updateStatus] = await client.execute(
+        `insert into ordertracking (id_order, id_status, time, update_by) values (?, ?, now(), ?)`,
+        [id, id_status, employee_id]
+      );
+      if (updateStatus.affectedRows === 0) {
+        resolve({
+          success: false,
+          message: "Cập nhật trạng thái đơn hàng thất bại",
+        });
+        await client.rollback();
+        return;
+      }
+      await client.commit();
+      resolve({
+        success: true,
+        message: "Cập nhật trạng thái đơn hàng thành công",
+      });
+      const [email] = await client.query(
+        `SELECT email FROM ${process.env.DATABASE_NAME}.order WHERE id = ?`,
+        [id]
+      );
+      const [nameStatus] = await client.query(
+        `SELECT name FROM ${process.env.DATABASE_NAME}.orderstatus WHERE id = ?`,
+        [id_status]
+      );
+      if (email.length !== 0 && nameStatus.length !== 0) {
+        const sendMail = await sendOrderStatusInfo(
+          email[0].email,
+          nameStatus[0].name,
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+        );
+        console.log(sendMail);
+      }
+    } catch (error) {
+      console.log(error);
+      await client.rollback();
+      reject({
+        success: false,
+        message: "Cập nhật trạng thái đơn hàng thất bại",
+      });
+    } finally {
+      if (client) client.release();
+    }
+  });
 
 export const getRevenueAndOrderOne = async () => {
   try {
@@ -248,6 +299,18 @@ export const cancelOrder = (id, userId) =>
         [id, userId]
       );
       if (rows.affectedRows === 0) {
+        resolve({
+          error: 1,
+          message: "Hủy đơn hàng thất bại",
+        });
+        await client.rollback();
+        return;
+      }
+      const [updateStatus] = await client.execute(
+        `insert into ordertracking (id_order, id_status, time) values (?, 8, now())`,
+        [id]
+      );
+      if (updateStatus.affectedRows === 0) {
         resolve({
           error: 1,
           message: "Hủy đơn hàng thất bại",

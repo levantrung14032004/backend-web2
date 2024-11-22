@@ -183,29 +183,19 @@ export const handleGetOrderStatus = async (req, res) => {
 
 export const handleUpdateOrderStatus = async (req, res) => {
   try {
+    const id = req.data.id;
     const orderId = req.body.orderId;
-    const employeeId = req.employee.id;
     const status = req.body.status;
     if (!orderId || !status) {
-      res.status(400).json({
+      return res.status(400).json({
         error: 1,
         message: "Missing orderId or status",
       });
-    } else {
-      const result = await orderService.updateOrderStatus(
-        orderId,
-        employeeId,
-        status
-      );
-      if (result) {
-        res.status(200).json({
-          success: true,
-          message: "Đã lưu thay đổi",
-        });
-      }
     }
+    const result = await orderService.updateOrderStatus(orderId, id, status);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json(error);
+    return res.status(500).json(error);
   }
 };
 
