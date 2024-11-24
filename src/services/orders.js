@@ -216,7 +216,8 @@ export const updateOrderStatus = (id, employee_id, id_status) =>
         const sendMail = await sendOrderStatusInfo(
           email[0].email,
           nameStatus[0].name,
-          new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
+          id
         );
         console.log(sendMail);
       }
@@ -333,7 +334,8 @@ export const cancelOrder = (id, userId) =>
       const sendMail = await sendOrderStatusInfo(
         email[0].email,
         "Đã hủy, do người dùng hủy",
-        new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
+        id
       );
       console.log(sendMail);
       resolve({

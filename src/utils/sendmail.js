@@ -95,7 +95,7 @@ Trân trọng,
     return null;
   }
 };
-export const sendOrderStatusInfo = async (toEmail, nameStatus, date) => {
+export const sendOrderStatusInfo = async (toEmail, nameStatus, date, id_order) => {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -114,10 +114,10 @@ export const sendOrderStatusInfo = async (toEmail, nameStatus, date) => {
     const mailOptions = {
       from: '"Comicola"<' + process.env.EMAIL + ">",
       to: toEmail,
-      subject: "Thông báo trạng thái đơn hàng từ cửa hàng sách Comicola",
+      subject: `Thông báo trạng thái đơn hàng mã ${id_order} từ cửa hàng sách Comicola`,
       text: `Xin chào ${toEmail},
 
-Chúng tôi xin thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+Chúng tôi xin thông báo rằng trạng thái đơn hàng mã ${id_order} của bạn đã được cập nhật.
       
 Trạng thái mới: ${nameStatus}
 Ngày cập nhật: ${date}
