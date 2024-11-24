@@ -21,8 +21,27 @@ const insertCompany = async (name, discount, description) => {
     return result;
   }
 };
+const updateCompany = async (id, name, discount, description, status) => {
+  const [result, fields] = await connection.execute(
+    `update company_delivery set name = ?, discount = ?, description = ?, status = ?  where id = ?`,
+    [name, discount, description, status, id]
+  );
 
-const deleteCompany = async (id) => {};
+  if (result != null) {
+    return result;
+  }
+};
+
+const deleteCompany = async (id) => {
+  const [result, fields] = await connection.execute(
+    `update company_delivery set status = 'stopped' where id = ?`,
+    [id]
+  );
+
+  if (result != null) {
+    return result;
+  }
+};
 
 const createGoodsReceived = async (
   dateReceived,
@@ -88,4 +107,10 @@ const createGoodsReceived = async (
   }
 };
 
-export { getCompany, insertCompany, deleteCompany, createGoodsReceived };
+export {
+  getCompany,
+  insertCompany,
+  deleteCompany,
+  createGoodsReceived,
+  updateCompany,
+};

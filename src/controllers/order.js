@@ -195,7 +195,7 @@ export const handleUpdateOrderStatus = async (req, res) => {
     const result = await orderService.updateOrderStatus(orderId, id, status);
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json("message" + error);
   }
 };
 
@@ -237,7 +237,14 @@ export const handleGetTrackingOrder = async (req, res) => {
           name_user: item.name_user,
           phone_number: item.phone_number,
           address: item.address,
-          trackings: [],
+          trackings: [
+            {
+              id_status: item.id_status,
+              name_employee: item.name_employee,
+              name_status: item.name,
+              time: item.time,
+            },
+          ],
         };
       } else {
         acc.trackings.push({

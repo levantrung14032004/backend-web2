@@ -3,6 +3,7 @@ import {
   insertCompany,
   deleteCompany,
   createGoodsReceived,
+  updateCompany,
 } from "../services/delivery.js";
 import moment from "moment";
 
@@ -24,6 +25,26 @@ const handleInsertCompany = async function (req, res) {
 
     if (result) {
       res.status(200).json({ code: 1, message: "Them thanh cong" });
+    }
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+};
+
+const handelUpdateCompany = async function (req, res) {
+  let id = req.body.id;
+  let name = req.body.name;
+  let discount = req.body.discount;
+  let infomation = req.body.infomation;
+  let status = req.body.status;
+
+  try {
+    const result = await updateCompany(id, name, discount, infomation, status);
+
+    if (result) {
+      res.status(200).json({ code: 1, message: "Sua thanh cong" });
+    } else {
+      res.status(200).json({ code: 0, message: "Sua that bai" });
     }
   } catch (error) {
     res.status(500).json(error.message);
@@ -54,11 +75,25 @@ const handleCreateReceived = async function (req, res) {
   }
 };
 
-const handleDeleteCompany = async function (req, res) {};
+const handleDeleteCompany = async function (req, res) {
+  try {
+    let id = req.body.id;
+    const result = await deleteCompany(id);
+    if (result) {
+      res.status(200).json({ code: 1, message: "Xoa thanh cong" });
+    } else {
+      res.status(200).json({ code: 0, message: "Xoa that bai" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
 
 export {
   handleGetCompany,
   handleInsertCompany,
   handleDeleteCompany,
+  handelUpdateCompany,
   handleCreateReceived,
 };
