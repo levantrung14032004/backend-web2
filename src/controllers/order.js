@@ -183,7 +183,7 @@ export const handleGetOrderStatus = async (req, res) => {
 
 export const handleUpdateOrderStatus = async (req, res) => {
   try {
-    const id = req.data.id;
+    const id = req.employee.id;
     const orderId = req.body.orderId;
     const status = req.body.status;
     if (!orderId || !status) {
