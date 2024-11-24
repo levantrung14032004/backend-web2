@@ -10,7 +10,7 @@ import {
 
 const generateAccessToken = (employee) => {
   return jwt.sign(employee, process.env.ACCESS_KEY, {
-    expiresIn: "5m",
+    expiresIn: "10m",
   });
 };
 
