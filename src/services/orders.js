@@ -176,8 +176,8 @@ export const updateOrderStatus = (id, employee_id, id_status) =>
       client = await connection.getConnection();
       await client.beginTransaction();
       const [rows, fields] = await client.execute(
-        `UPDATE ${process.env.DATABASE_NAME}.order SET status = ?, employee_id = ? WHERE id = ?`,
-        [id_status, employee_id, id]
+        `UPDATE ${process.env.DATABASE_NAME}.order SET status = ?, employee_id = ? WHERE id = ? and status < ? and status < 7`,
+        [id_status, employee_id, id, id_status]
       );
       if (rows.affectedRows === 0) {
         resolve({
