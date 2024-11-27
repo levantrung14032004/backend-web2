@@ -35,7 +35,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: false,
-      sameSite:"lax"
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     },
   })
 );
