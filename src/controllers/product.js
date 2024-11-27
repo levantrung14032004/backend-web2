@@ -39,17 +39,6 @@ export const handleDeleteProduct = async (req, res) => {
   }
 };
 
-export const handleSortTitle = async (req, res) => {
-  try {
-    let result = await productService.sortProductWithTitle();
-    result != null
-      ? res.status(200).json(result)
-      : res.status(500).json("have error");
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
-
 export const handleSortLowToHigh = async (req, res) => {
   try {
     let result = await productService.sortDateLowToHigh();

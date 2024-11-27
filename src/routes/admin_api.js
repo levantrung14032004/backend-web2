@@ -1,7 +1,6 @@
 import {
   handleGetAllProducts,
   handleDeleteProduct,
-  handleSortTitle,
   handleSortLowToHigh,
   handleSortHighToLow,
   handleGetProductWithCategory,
@@ -31,6 +30,7 @@ import {
   handleGetEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
+  handleSearchEmployee,
 } from "../controllers/employee.js";
 
 import {
@@ -132,7 +132,6 @@ routeAPI.put("/category/delete", verifyToken, category.handleDeleteCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
-routeAPI.get("/product/filter/title", handleSortTitle);
 
 // Temporary Product
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);
@@ -205,5 +204,6 @@ routeAPI.get("/discount-search", handleSearchDiscount);
 routeAPI.get("/company-search", handleSearchCompany);
 routeAPI.get("/category-search", category.handleSearchCategory);
 routeAPI.get("/author-search", handleSearchAuthor);
+routeAPI.get("/employee-search", handleSearchEmployee);
 
 export default routeAPI;

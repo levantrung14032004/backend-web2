@@ -65,9 +65,31 @@ const handleEditEmployee = async (req, res) => {
   }
 };
 
+const handleSearchEmployee = async (req, res) => {
+  try {
+    const emplloyees = await getEmployee();
+    const { search } = req.query;
+    const value = String(search).toLowerCase();
+    const resultSearch = emplloyees.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
 export {
   handleGetEmployee,
   handleGetCurentEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
+  handleSearchEmployee,
 };
