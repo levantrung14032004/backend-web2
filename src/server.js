@@ -1,6 +1,5 @@
 import express from "express";
 import "dotenv/config";
-import router from "./routes/web.js";
 import routerAPI from "./routes/api.js";
 import routerAdmin from "./routes/admin_api.js";
 import routerAuth from "./routes/auth.js";

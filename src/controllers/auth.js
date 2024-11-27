@@ -162,9 +162,9 @@ export const check_status = async (req, res) => {
   try {
     const id = req.session.user_id;
     console.log(id);
-    if (id) {
+    if (!id) {
       return res.status(200).json({
-        error: 0,
+        error: 1,
       });
     }
     const refresh_token = req.cookies["refresh_token"];
