@@ -16,8 +16,7 @@ export const login = async (req, res) => {
     if (result.error === 1) return res.status(200).json(result);
 
     const userAgent = req.headers["user-agent"];
-    const ipAddress =
-      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    const ipAddress = req.connection.remoteAddress;
 
     const { token, refresh_token, public_key_token, public_key_refresh_token } =
       create_token(result.id, result.role_id, userAgent, ipAddress);
@@ -112,8 +111,7 @@ export const refresh_token = async (req, res) => {
           });
         }
         const userAgent = req.headers["user-agent"];
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const ipAddress = req.connection.remoteAddress;
         if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
           return res.status(401).json({
             error: 1,
@@ -191,8 +189,7 @@ export const check_status = async (req, res) => {
           });
         }
         const userAgent = req.headers["user-agent"];
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const ipAddress = req.connection.remoteAddress;
         if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
           return res.status(401).json({
             error: 1,
