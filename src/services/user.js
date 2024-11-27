@@ -804,10 +804,11 @@ export const get_publicKey_refreshTokenByRefreshToken = (refresh_token) =>
         `SELECT publicKey_RefreshToken FROM user WHERE RefreshToken = ?`,
         [refresh_token]
       );
+      console.log(result);
       const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
       resolve({
-        error: publicKey_RefreshToken ? 0 : 1,
-        publicKey_RefreshToken: publicKey_RefreshToken || null,
+        error: publicKey_RefreshToken !== null ? 0 : 1,
+        publicKey_RefreshToken
       });
     } catch (error) {
       console.log(error);
