@@ -15,7 +15,7 @@ var app = express();
 var server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"], // Thay đổi theo môi trường thực tế
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL], // Thay đổi theo môi trường thực tế
     methods: ["GET", "POST"],
     credentials: true,
   },
