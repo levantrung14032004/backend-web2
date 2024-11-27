@@ -23,6 +23,7 @@ import {
   handleDeleteCompany,
   handleCreateReceived,
   handelUpdateCompany,
+  handleSearchCompany,
 } from "../controllers/company.js";
 
 import {
@@ -51,6 +52,7 @@ import {
   handleAddAuthor,
   handleUpdateAuthor,
   handleDeleteAuthor,
+  handleSearchAuthor,
 } from "../controllers/author.js";
 import express from "express";
 import * as products from "../controllers/product.js";
@@ -81,6 +83,7 @@ import {
   handleGetDiscounts,
   handleGetUserAmountMinMax,
   handleInsertDiscount,
+  handleSearchDiscount,
   handleUpdateDiscount,
 } from "../controllers/discount.js";
 const routeAPI = express.Router();
@@ -121,8 +124,8 @@ routeAPI.put(
 );
 
 //Category
-routeAPI.get("/category", category.getAllCategory);
-routeAPI.get("/all-category", category.getAllCategory);
+routeAPI.get("/category", category.handleGetAllCategory);
+routeAPI.get("/all-category", category.handleGetAllCategory);
 routeAPI.post("/category", verifyToken, category.handleInsertCategory);
 routeAPI.put("/category/update", verifyToken, category.handleUpdateCategory);
 routeAPI.put("/category/delete", verifyToken, category.handleDeleteCategory);
@@ -196,5 +199,11 @@ routeAPI.get(
 );
 routeAPI.post("/discount-max-min", verifyToken, handleGetUserAmountMinMax);
 routeAPI.post("/drop-discount", verifyToken, handleDropDiscount);
+
+// Search
+routeAPI.get("/discount-search", handleSearchDiscount);
+routeAPI.get("/company-search", handleSearchCompany);
+routeAPI.get("/category-search", category.handleSearchCategory);
+routeAPI.get("/author-search", handleSearchAuthor);
 
 export default routeAPI;

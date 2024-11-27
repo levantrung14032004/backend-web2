@@ -42,7 +42,7 @@ export const getCategoryById = async (req, res) => {
   }
 };
 
-export const getAllCategory = async (req, res) => {
+export const handleGetAllCategory = async (req, res) => {
   try {
     const result = await categoryService.getAllCategory();
     return res.status(200).json(result);
@@ -100,5 +100,26 @@ export const handleUpdateCategory = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
+  }
+};
+
+export const handleSearchCategory = async (req, res) => {
+  try {
+    const allCategory = await categoryService.getAllCategory();
+    const { search } = req.query;
+    const value = String(search).toLowerCase();
+    const resultSearch = allCategory.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
   }
 };

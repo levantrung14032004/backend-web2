@@ -55,7 +55,7 @@ routeAPI.get("/product/category", products.getProductByCategory);
 
 routeAPI.get("/author", handleGetAuthors);
 //Category
-routeAPI.get("/category", category.getAllCategory);
+routeAPI.get("/category", category.handleGetAllCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);

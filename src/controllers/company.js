@@ -90,6 +90,27 @@ const handleDeleteCompany = async function (req, res) {
   }
 };
 
+export const handleSearchCompany = async (req, res) => {
+  try {
+    const allCompany = await getCompany();
+    const { search } = req.query;
+    const value = String(search).toLowerCase();
+    const resultSearch = allCompany.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
 export {
   handleGetCompany,
   handleInsertCompany,

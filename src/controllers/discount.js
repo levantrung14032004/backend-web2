@@ -109,3 +109,24 @@ export const handleUpdateDiscount = async (req, res) => {
     console.log(error);
   }
 };
+
+export const handleSearchDiscount = async (req, res) => {
+  try {
+    const allDiscount = await getDiscounts();
+    const { search } = req.query;
+    const value = String(search).toLowerCase();
+    const resultSearch = allDiscount.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
