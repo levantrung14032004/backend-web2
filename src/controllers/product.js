@@ -234,3 +234,21 @@ export const handleUpdateProduct = async (req, res) => {
     res.status(500).json({ code: 1, message: "LOI KHI UPDATE" });
   }
 };
+export const handleSearchProduct = async (req, res) => {
+  try {
+    const text = req.query.text;
+    if (!text) {
+      return res.status(400).json("Missing text");
+    }
+    const value =String(text).toLowerCase();
+    const result = await productService.getProduct();
+    const result_search = result.filter((product) =>
+      Object.entries(product).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    return res.status(200).json(result_search);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import dot from "dotenv";
 dot.config();
 const getUsers = async () => {
-  const [result, fields] = await connection.query("SELECT * FROM user");
+  const [result, fields] = await connection.query("SELECT id,role_id,email,status,first_name,last_name,fullname,phone_number,address FROM user");
   return result;
 };
 

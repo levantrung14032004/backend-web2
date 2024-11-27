@@ -1,3 +1,4 @@
+import { error } from "console";
 import {
   getEmployee,
   getCurrentEmployee,
@@ -64,7 +65,25 @@ const handleEditEmployee = async (req, res) => {
     res.json(error);
   }
 };
-
+export const handleSearchEmployee = async (req, res) => {
+  try {
+    const search = req.query.search;
+    if (!search) {
+      return res.status(400).json({ error: 1, message: "Missing search" });
+    }
+    const value = String(search).toLowerCase();
+    const result = await getEmployee();
+    const result_search = result.filter((employee) =>
+      Object.entries(employee).some((entry) => {
+        if (entry[0] === "password") return false;
+        return String(entry[1]).toLowerCase().includes(value);
+      })
+    );
+    return res.status(200).json(result_search);
+  } catch {
+    return res.status(500).json(error);
+  }
+};
 export {
   handleGetEmployee,
   handleGetCurentEmployee,

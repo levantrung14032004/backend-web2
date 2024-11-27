@@ -46,13 +46,11 @@ routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", handleGetAllProducts);
 routeAPI.get("/search", handleSearchProducts);
-// routeAPI.put("/product", handleDeleteProduct); // route này phải để ở admin phải có xác thực mới được xóa sửa lại đi nha
 routeAPI.get("/product/mainpage", products.get_products_at_home);
 routeAPI.get("/product/detail", products.get_product_by_id);
 routeAPI.get("/product/limit", products.getProductlimit);
 routeAPI.get("/product/category", products.getProductByCategory);
 // Authors
-
 routeAPI.get("/author", handleGetAuthors);
 //Category
 routeAPI.get("/category", category.handleGetAllCategory);
