@@ -2,7 +2,6 @@ import {
   handleGetAllProducts,
   handleSearchProducts,
   handleDeleteProduct,
-  handleSortTitle,
   handleSortLowToHigh,
   handleSortHighToLow,
   handleGetProductWithCategory,
@@ -57,7 +56,6 @@ routeAPI.get("/category", category.handleGetAllCategory);
 //Product.Filter
 routeAPI.get("/product/filter/low_to_high", handleSortLowToHigh);
 routeAPI.get("/product/filter/high_to_low", handleSortHighToLow);
-routeAPI.get("/product/filter/title", handleSortTitle);
 
 // Temporary Product
 routeAPI.post("/creat-temp-product", handleCreateProductTemp);

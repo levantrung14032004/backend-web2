@@ -183,24 +183,6 @@ export const deleteProduct = async (idProduct) => {
   }
 };
 
-export const sortProductWithTitle = async () => {
-  try {
-    const [result, fields] =
-      await connection.execute(`SELECT p.*, a.name AS author_name, c.name AS category_name, GROUP_CONCAT(g.thumbnail SEPARATOR ',') AS gallery_images
-            FROM product p
-            LEFT JOIN gallery g ON p.id = g.product_id
-            LEFT JOIN author a ON p.author_id = a.id
-            LEFT JOIN category c ON p.category_id = c.id
-            GROUP BY p.id
-            ORDER BY p.title`);
-
-    return result;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
-
 export const getProductWithCategory = async (id) => {
   try {
     const [result, fields] = await connection.execute(
