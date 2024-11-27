@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 import dot from "dotenv";
 dot.config();
 const getUsers = async () => {
-  const [result, fields] = await connection.query("SELECT id,role_id,email,status,first_name,last_name,fullname,phone_number,address FROM user");
+  const [result, fields] = await connection.query(
+    "SELECT id,role_id,email,status,first_name,last_name,fullname,phone_number,address FROM user"
+  );
   return result;
 };
 
@@ -804,11 +806,10 @@ export const get_publicKey_refreshTokenByRefreshToken = (refresh_token) =>
         `SELECT publicKey_RefreshToken FROM user WHERE RefreshToken = ?`,
         [refresh_token]
       );
-      console.log(result);
       const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
       resolve({
-        error: publicKey_RefreshToken !== null ? 0 : 1,
-        publicKey_RefreshToken
+        error: publicKey_RefreshToken ? 0 : 1,
+        publicKey_RefreshToken,
       });
     } catch (error) {
       console.log(error);
