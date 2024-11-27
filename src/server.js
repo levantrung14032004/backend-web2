@@ -20,7 +20,6 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
-app.use(cors({ credentials: true, origin: true }));
 var port = process.env.SERVER_PORT || 8080;
 app.use(
   cors({
