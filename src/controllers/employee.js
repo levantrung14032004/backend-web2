@@ -89,5 +89,4 @@ export {
   handleGetCurentEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
-  handleSearchEmployee,
 };
