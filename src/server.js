@@ -27,6 +27,7 @@ app.use(
     credentials: true,
   })
 );
+app.set('trust proxy', 1); // Trust first proxy
 app.use(
   session({
     secret: create_secret_key(),
