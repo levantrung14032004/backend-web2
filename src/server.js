@@ -21,6 +21,7 @@ const io = new SocketIOServer(server, {
   },
 });
 var port = process.env.SERVER_PORT || 8080;
+app.set('trust proxy', 1); // Trust first proxy
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
@@ -28,7 +29,6 @@ app.use(
     credentials: true,
   })
 );
-app.set('trust proxy', 1); // Trust first proxy
 app.use(
   session({
     secret: create_secret_key(),
