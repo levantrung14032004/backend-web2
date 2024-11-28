@@ -35,13 +35,15 @@ export const login = async (req, res) => {
     return res
       .cookie("access_token", token, {
         httpOnly: true,
-        maxAge: Number(process.env.expiresIn_JWT),
+        maxAge: 10000,
         secure: true,
         sameSite: "none",
       })
       .cookie("refresh_token", refresh_token, {
         httpOnly: true,
-        expires: new Date(Date.now() + Number(process.env.expiresIn_RefreshToken)),
+        expires: new Date(
+          Date.now() + Number(process.env.expiresIn_RefreshToken)
+        ),
         secure: true,
         sameSite: "none",
       })
@@ -138,12 +140,15 @@ export const refresh_token = async (req, res) => {
         return res
           .cookie("access_token", token, {
             httpOnly: true,
+            maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
             httpOnly: true,
+            expires: new Date(
+              Date.now() + Number(process.env.expiresIn_RefreshToken)
+            ),
             secure: true,
             sameSite: "none",
           })
@@ -212,12 +217,15 @@ export const check_status = async (req, res) => {
         return res
           .cookie("access_token", token, {
             httpOnly: true,
+            maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
             httpOnly: true,
+            expires: new Date(
+              Date.now() + Number(process.env.expiresIn_RefreshToken)
+            ),
             secure: true,
             sameSite: "none",
           })
