@@ -39,7 +39,7 @@ export const login = async (req, res) => {
         sameSite: "none",
       })
       .cookie("refresh_token", refresh_token, {
-        expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
+        expires: new Date(Date.now() + Number(process.env.expiresIn_RefreshToken)),
         httpOnly: true,
         secure: true,
         sameSite: "none",
