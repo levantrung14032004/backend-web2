@@ -16,8 +16,7 @@ export const login = async (req, res) => {
     if (result.error === 1) return res.status(200).json(result);
 
     const userAgent = req.headers["user-agent"];
-    const ipAddress =
-      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    const ipAddress = req.connection.remoteAddress;
 
     const { token, refresh_token, public_key_token, public_key_refresh_token } =
       create_token(result.id, result.role_id, userAgent, ipAddress);
@@ -35,13 +34,16 @@ export const login = async (req, res) => {
     req.session.user_id = result.id;
     return res
       .cookie("access_token", token, {
-        httpOnly: true,
+        httpOnly: fasle,
+        maxAge: 10000,
         secure: true,
         sameSite: "none",
       })
       .cookie("refresh_token", refresh_token, {
-        expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
-        httpOnly: true,
+        httpOnly: fasle,
+        expires: new Date(
+          Date.now() + Number(process.env.expiresIn_RefreshToken)
+        ),
         secure: true,
         sameSite: "none",
       })
@@ -112,8 +114,7 @@ export const refresh_token = async (req, res) => {
           });
         }
         const userAgent = req.headers["user-agent"];
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const ipAddress = req.connection.remoteAddress;
         if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
           return res.status(401).json({
             error: 1,
@@ -138,13 +139,16 @@ export const refresh_token = async (req, res) => {
         }
         return res
           .cookie("access_token", token, {
-            httpOnly: true,
+            httpOnly: fasle,
+            maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
-            httpOnly: true,
+            httpOnly: fasle,
+            expires: new Date(
+              Date.now() + Number(process.env.expiresIn_RefreshToken)
+            ),
             secure: true,
             sameSite: "none",
           })
@@ -162,12 +166,6 @@ export const refresh_token = async (req, res) => {
 };
 export const check_status = async (req, res) => {
   try {
-    const id = req.session.user_id;
-    if (id) {
-      return res.status(200).json({
-        error: 0,
-      });
-    }
     const refresh_token = req.cookies["refresh_token"];
     if (!refresh_token) {
       return res.status(200).json({
@@ -191,8 +189,7 @@ export const check_status = async (req, res) => {
           });
         }
         const userAgent = req.headers["user-agent"];
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const ipAddress = req.connection.remoteAddress;
         if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
           return res.status(401).json({
             error: 1,
@@ -219,13 +216,16 @@ export const check_status = async (req, res) => {
         req.session.user_id = data.id;
         return res
           .cookie("access_token", token, {
-            httpOnly: true,
+            httpOnly: fasle,
+            maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            expires: new Date(Date.now() + +process.env.expiresIn_RefreshToken),
-            httpOnly: true,
+            httpOnly: fasle,
+            expires: new Date(
+              Date.now() + Number(process.env.expiresIn_RefreshToken)
+            ),
             secure: true,
             sameSite: "none",
           })

@@ -1,10 +1,9 @@
-import * as product from "../controllers/product.js";
-import upload from "../middleware/multer.js";
 import express from "express";
 const route = express.Router();
 
-
-route.get("/api/product", product.handleGetAllProducts);
-route.post("/add-product", upload.array("product", 5), product.add_product);
+route.get("/cron-job", (req, res) => {
+  console.log("Cron job is running");
+  return res.status(200).json({ message: "Cron job is running" });
+});
 
 export default route;

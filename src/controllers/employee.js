@@ -1,3 +1,4 @@
+import { error } from "console";
 import {
   getEmployee,
   getCurrentEmployee,
@@ -64,32 +65,28 @@ const handleEditEmployee = async (req, res) => {
     res.json(error);
   }
 };
-
-const handleSearchEmployee = async (req, res) => {
+export const handleSearchEmployee = async (req, res) => {
   try {
-    const emplloyees = await getEmployee();
-    const { search } = req.query;
-    const value = String(search).toLowerCase();
-    const resultSearch = emplloyees.filter((o) =>
-      Object.entries(o).some((entry) =>
-        String(entry[1]).toLowerCase().includes(value)
-      )
-    );
-    if (resultSearch) {
-      res
-        .status(200)
-        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    const search = req.query.search;
+    if (!search) {
+      return res.status(400).json({ error: 1, message: "Missing search" });
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ code: -1, message: "Lỗi server" });
+    const value = String(search).toLowerCase();
+    const result = await getEmployee();
+    const result_search = result.filter((employee) =>
+      Object.entries(employee).some((entry) => {
+        if (entry[0] === "password") return false;
+        return String(entry[1]).toLowerCase().includes(value);
+      })
+    );
+    return res.status(200).json(result_search);
+  } catch {
+    return res.status(500).json(error);
   }
 };
-
 export {
   handleGetEmployee,
   handleGetCurentEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
-  handleSearchEmployee,
 };

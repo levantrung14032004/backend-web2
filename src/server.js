@@ -1,9 +1,9 @@
 import express from "express";
 import "dotenv/config";
-import router from "./routes/web.js";
 import routerAPI from "./routes/api.js";
 import routerAdmin from "./routes/admin_api.js";
 import routerAuth from "./routes/auth.js";
+import routeWeb from "./routes/web.js";
 import cors from "cors";
 import session from "express-session";
 import create_secret_key from "./utils/create_secret_key.js";
@@ -15,17 +15,18 @@ var app = express();
 var server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"], // Thay đổi theo môi trường thực tế
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL], // Thay đổi theo môi trường thực tế
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
-app.use(cors({ credentials: true, origin: true }));
 var port = process.env.SERVER_PORT || 8080;
+app.set('trust proxy', 1); // Trust first proxy
 app.use(
   cors({
-    credentials: true,
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
+    methods: ["get", "post", "put", "delete"],
+    credentials: true,
   })
 );
 app.use(
@@ -34,8 +35,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     },
   })
 );
@@ -97,6 +99,7 @@ app.use("/static", express.static("public"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
+app.use("/web", routeWeb);
 app.use("/api/v2", routerAdmin);
 app.use("/api", routerAPI);
 app.use("/auth", routerAuth);

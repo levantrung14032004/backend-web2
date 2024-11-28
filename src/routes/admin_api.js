@@ -14,6 +14,7 @@ import {
   handleAddOrder,
   handleGetAllUsers,
   handleChangeStatusUser,
+  handleSearchUser
 } from "../controllers/user.js";
 
 import {
@@ -30,7 +31,7 @@ import {
   handleGetEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
-  handleSearchEmployee,
+  handleSearchEmployee
 } from "../controllers/employee.js";
 
 import {
@@ -208,6 +209,7 @@ routeAPI.get("/discount-search", handleSearchDiscount);
 routeAPI.get("/company-search", handleSearchCompany);
 routeAPI.get("/category-search", category.handleSearchCategory);
 routeAPI.get("/author-search", handleSearchAuthor);
+routeAPI.get("/product-search", products.handleSearchProduct);
+routeAPI.get("/user-search", handleSearchUser);
 routeAPI.get("/employee-search", handleSearchEmployee);
-
 export default routeAPI;

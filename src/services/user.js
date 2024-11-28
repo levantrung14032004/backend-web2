@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 import dot from "dotenv";
 dot.config();
 const getUsers = async () => {
-  const [result, fields] = await connection.query("SELECT * FROM user");
+  const [result, fields] = await connection.query(
+    "SELECT id,role_id,email,status,first_name,last_name,fullname,phone_number,address FROM user"
+  );
   return result;
 };
 
@@ -440,7 +442,7 @@ export const changeInfo = (
 export const getAddressById = async (id) => {
   try {
     const [result, other] = await connection.execute(
-      `select * from addressDetail where id_user = ?`,
+      `select * from addressdetail where id_user = ?`,
       [id]
     );
     if (result) {
@@ -496,7 +498,7 @@ export const selectAddress = (id_user, id) =>
       client = await connection.getConnection();
       await client.beginTransaction();
       const [list_address] = await client.query(
-        "select * from addressDetail where id_user = ? ",
+        "select * from addressdetail where id_user = ? ",
         [id_user]
       );
       if (list_address.length === 0) {
@@ -509,7 +511,7 @@ export const selectAddress = (id_user, id) =>
       }
       if (list_address.length > 1) {
         const [result] = await client.execute(
-          `update addressDetail set setdefault = '0' where id_user = ? and setdefault = '1'`,
+          `update addressdetail set setdefault = '0' where id_user = ? and setdefault = '1'`,
           [id_user]
         );
         if (result.affectedRows === 0) {
@@ -522,7 +524,7 @@ export const selectAddress = (id_user, id) =>
         }
       }
       const [result2] = await client.execute(
-        `update addressDetail set setdefault = '1' where id = ? and id_user = ? `,
+        `update addressdetail set setdefault = '1' where id = ? and id_user = ? `,
         [id, id_user]
       );
       if (result2.affectedRows === 0) {
@@ -566,13 +568,13 @@ export const addAddress = (
       client = await connection.getConnection();
       await client.beginTransaction();
       const [list_address] = await client.query(
-        "select * from addressDetail where id_user = ? ",
+        "select * from addressdetail where id_user = ? ",
         [id]
       );
       const sql =
         list_address.length === 0
-          ? "insert into addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail, setdefault) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-          : "insert into addressDetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          ? "insert into addressdetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail, setdefault) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+          : "insert into addressdetail (id_user, phone_number, email, firstName, lastName, province, district, ward, detail) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
       const arr =
         list_address.length === 0
           ? [
@@ -631,7 +633,7 @@ export const deleteAddress = (id, id_user) =>
       client = await connection.getConnection();
       await client.beginTransaction();
       const [address] = await client.query(
-        `select * from addressDetail where id = ? and id_user = ?`,
+        `select * from addressdetail where id = ? and id_user = ?`,
         [id, id_user]
       );
       if (address.length === 0) {
@@ -642,7 +644,7 @@ export const deleteAddress = (id, id_user) =>
         return;
       }
       const [result] = await client.execute(
-        `DELETE FROM addressDetail WHERE id = ? and id_user= ?`,
+        `DELETE FROM addressdetail WHERE id = ? and id_user= ?`,
         [id, id_user]
       );
       if (result.affectedRows === 0) {
@@ -655,12 +657,12 @@ export const deleteAddress = (id, id_user) =>
       }
       if (address[0].setdefault === "1") {
         const [count] = await client.query(
-          `select count(*) as count from addressDetail where id_user = ?`,
+          `select count(*) as count from addressdetail where id_user = ?`,
           [id_user]
         );
         if (count[0].count > 0) {
           const [setdefault] = await client.execute(
-            `update addressDetail set setdefault = 1 where id_user = ? order by id limit 1`,
+            `update addressdetail set setdefault = 1 where id_user = ? order by id limit 1`,
             [id_user]
           );
           if (setdefault.affectedRows === 0) {
@@ -704,7 +706,7 @@ export const editAddress = (
   new Promise(async (resolve, reject) => {
     try {
       const result = await connection.execute(
-        `UPDATE addressDetail SET phone_number = ?, email = ?, firstName = ?, lastName = ?, province = ?, district = ?, ward = ?, detail = ? WHERE id = ? and id_user = ? `,
+        `UPDATE addressdetail SET phone_number = ?, email = ?, firstName = ?, lastName = ?, province = ?, district = ?, ward = ?, detail = ? WHERE id = ? and id_user = ? `,
         [
           phone_number,
           email,
@@ -807,7 +809,7 @@ export const get_publicKey_refreshTokenByRefreshToken = (refresh_token) =>
       const publicKey_RefreshToken = result[0].publicKey_RefreshToken;
       resolve({
         error: publicKey_RefreshToken ? 0 : 1,
-        publicKey_RefreshToken: publicKey_RefreshToken || null,
+        publicKey_RefreshToken,
       });
     } catch (error) {
       console.log(error);

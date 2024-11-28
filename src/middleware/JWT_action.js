@@ -6,6 +6,7 @@ export const authenticateToken = async (req, res, next) => {
     if (access_token == null) {
       return res.status(401).json({ code: 2, message: "Token is missing" });
     }
+    console.log(req.session.user_id);
     if (!req.session.user_id) {
       return res.status(401).json({ code: 2, message: "Token is invalid" });
     }
@@ -21,8 +22,7 @@ export const authenticateToken = async (req, res, next) => {
         return res.status(401).json({ code: 2, message: "Token is invalid" });
       }
       const userAgent = req.headers["user-agent"];
-      const ipAddress =
-        req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+      const ipAddress = req.connection.remoteAddress;
       if (data.userAgent !== userAgent || data.ipAddress !== ipAddress) {
         return res.status(401).json({ code: 2, message: "Token is invalid" });
       }

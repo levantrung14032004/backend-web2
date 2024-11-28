@@ -390,3 +390,28 @@ export const handleChangeStatusUser = async (req, res) => {
     res.status(500).error(error);
   }
 };
+export const handleSearchUser = async (req, res) => {
+  try {
+    const search = req.query.search;
+    if (!search)
+      return res.status(400).json({ error: 1, message: "Missing search" });
+    const result = await userService.getUsers();
+    const value = String(search).toLowerCase();
+    const resultSearch = result.filter((o) =>
+      Object.entries(o).some((entry) => {
+        if (
+          entry[0] === "password" ||
+          entry[0] === "publicKey_Token" ||
+          entry[0] === "publicKey_RefreshToken" ||
+          entry[0] === "RefreshToken"
+        )
+          return false;
+        return String(entry[1]).toLowerCase().includes(value);
+      })
+    );
+    return res.status(200).json(resultSearch);
+  } catch (error) {
+    console.log(error);
+    res.status(500).error(error);
+  }
+};
