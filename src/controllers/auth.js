@@ -34,13 +34,14 @@ export const login = async (req, res) => {
     req.session.user_id = result.id;
     return res
       .cookie("access_token", token, {
-        httpOnly: false,
+        httpOnly: true,
+        maxAge: Number(process.env.expiresIn_JWT),
         secure: true,
         sameSite: "none",
       })
       .cookie("refresh_token", refresh_token, {
+        httpOnly: true,
         expires: new Date(Date.now() + Number(process.env.expiresIn_RefreshToken)),
-        httpOnly: false,
         secure: true,
         sameSite: "none",
       })
