@@ -16,12 +16,12 @@ var server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL], // Thay đổi theo môi trường thực tế
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT"],
     credentials: true,
   },
 });
 var port = process.env.SERVER_PORT || 8080;
-app.set('trust proxy', 1); // Trust first proxy
+app.set("trust proxy", 1); // Trust first proxy
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
@@ -37,7 +37,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   })
 );

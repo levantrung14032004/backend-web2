@@ -14,7 +14,7 @@ import {
   handleAddOrder,
   handleGetAllUsers,
   handleChangeStatusUser,
-  handleSearchUser
+  handleSearchUser,
 } from "../controllers/user.js";
 
 import {
@@ -31,7 +31,7 @@ import {
   handleGetEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
-  handleSearchEmployee
+  handleSearchEmployee,
 } from "../controllers/employee.js";
 
 import {
@@ -105,14 +105,14 @@ routeAPI.put("/employee", verifyToken, handleDeleteEmployee);
 routeAPI.get("/role", handleGetRole);
 routeAPI.get("/permissions", handleGetPermissions);
 routeAPI.get("/all-permissions", handleGetAllPermission);
-routeAPI.put("/role-change", verifyToken, checkPermission, handleSetPermission);
+routeAPI.put("/role-change", verifyToken, handleSetPermission);
 routeAPI.get("/action-view", verifyToken, handleGetActionView);
 routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", verifyToken, checkPermission, handleGetAllProducts);
-routeAPI.put("/product", verifyToken, checkPermission, handleDeleteProduct);
+routeAPI.put("/product", verifyToken, handleDeleteProduct);
 routeAPI.post(
   "/product/add-product",
   verifyToken,

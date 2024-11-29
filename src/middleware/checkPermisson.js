@@ -9,17 +9,19 @@ const check = async (query) => {
   return rows;
 };
 
-const checkPermission = async (req, res, next) => {
+const checkPermission = (req, res, next) => {
   try {
     const role_id = req.employee.role_id;
-    const action = req.query.action || req.body.action;
+    const action = req.body.action || req.query.action;
     const entity = req.query.entity || req.body.entity;
+
+    console.log("role_id", role_id, "action", action, "entity", entity);
 
     const query = `select * from role_permissions rp join permissions p
                     on rp.permission_id = p.id
                     where rp.role_id= ${role_id} and  p.entity = '${entity}' and p.action = '${action}'`;
 
-    if (await check(query)) {
+    if (check(query)) {
       next();
     } else {
       res
