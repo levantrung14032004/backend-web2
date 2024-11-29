@@ -6,7 +6,6 @@ export const authenticateToken = async (req, res, next) => {
     if (access_token == null) {
       return res.status(401).json({ code: 2, message: "Token is missing" });
     }
-    console.log(req.session.user_id);
     if (!req.session.user_id) {
       return res.status(401).json({ code: 2, message: "Token is invalid" });
     }

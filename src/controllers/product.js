@@ -229,12 +229,24 @@ export const handleSearchProduct = async (req, res) => {
     if (!text) {
       return res.status(400).json("Missing text");
     }
-    const value =String(text).toLowerCase();
+    const value = String(text).toLowerCase();
     const result = await productService.getProduct();
     const result_search = result.filter((product) =>
-      Object.entries(product).some((entry) =>
-        String(entry[1]).toLowerCase().includes(value)
-      )
+      Object.entries(product).some((entry) => {
+        if (
+          entry[0] === "author_id" ||
+          entry[0] === "thumbnail" ||
+          entry[0] === "description" ||
+          entry[0] === "introduce" ||
+          entry[0] === "created_at" ||
+          entry[0] === "update_at" ||
+          entry[0] === "quantity"
+        )
+          return false;
+        if(entry[0] === "status")
+          return String("Còn hàng").toLowerCase().includes(value) || String("Hết hàng").toLowerCase().includes(value)
+        return String(entry[1]).toLowerCase().includes(value);
+      })
     );
     return res.status(200).json(result_search);
   } catch (error) {
