@@ -25,7 +25,7 @@ app.set("trust proxy", 1); // Trust first proxy
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
-    methods: ["get", "post", "put", "delete"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );

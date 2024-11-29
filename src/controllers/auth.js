@@ -34,13 +34,13 @@ export const login = async (req, res) => {
     req.session.user_id = result.id;
     return res
       .cookie("access_token", token, {
-        httpOnly: fasle,
+        httpOnly: true,
         maxAge: 10000,
         secure: true,
         sameSite: "none",
       })
       .cookie("refresh_token", refresh_token, {
-        httpOnly: fasle,
+        httpOnly: true,
         expires: new Date(
           Date.now() + Number(process.env.expiresIn_RefreshToken)
         ),
@@ -139,13 +139,13 @@ export const refresh_token = async (req, res) => {
         }
         return res
           .cookie("access_token", token, {
-            httpOnly: fasle,
+            httpOnly: true,
             maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            httpOnly: fasle,
+            httpOnly: true,
             expires: new Date(
               Date.now() + Number(process.env.expiresIn_RefreshToken)
             ),
@@ -216,13 +216,13 @@ export const check_status = async (req, res) => {
         req.session.user_id = data.id;
         return res
           .cookie("access_token", token, {
-            httpOnly: fasle,
+            httpOnly: true,
             maxAge: 10000,
             secure: true,
             sameSite: "none",
           })
           .cookie("refresh_token", refresh_token, {
-            httpOnly: fasle,
+            httpOnly: true,
             expires: new Date(
               Date.now() + Number(process.env.expiresIn_RefreshToken)
             ),
