@@ -34,6 +34,40 @@ export const getProduct = () =>
       reject(null);
     }
   });
+export const getProductForAdmin = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [rows, fields] = await connection.query(`SELECT 
+      p.*,
+          GROUP_CONCAT(DISTINCT JSON_OBJECT('id', c.id, 'label', c.name)) AS category,
+          GROUP_CONCAT(DISTINCT g.thumbnail) AS gallery
+        FROM 
+          product p
+        LEFT JOIN 
+          product_category pc ON p.id = pc.id_Product
+        LEFT JOIN 
+          category c ON pc.id_Category = c.id
+        LEFT JOIN 
+          gallery g ON p.id = g.product_id
+        WHERE 
+        c.status = 1 and g.status = 1
+        GROUP BY 
+          p.id
+        ORDER BY 
+          p.update_at DESC`);
+      const products = rows.map((product) => {
+        return {
+          ...product,
+          category: JSON.parse(`[${product.category}]`),
+          gallery: product.gallery ? product.gallery.split(",") : [],
+        };
+      });
+      resolve(products);
+    } catch (error) {
+      console.log(error);
+      reject(null);
+    }
+  });
 export const getProductlimit = (limit) =>
   new Promise(async (resolve, reject) => {
     try {
