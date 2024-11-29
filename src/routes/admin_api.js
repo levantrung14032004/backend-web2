@@ -14,7 +14,7 @@ import {
   handleAddOrder,
   handleGetAllUsers,
   handleChangeStatusUser,
-  handleSearchUser
+  handleSearchUser,
 } from "../controllers/user.js";
 
 import {
@@ -31,7 +31,7 @@ import {
   handleGetEmployee,
   handleDeleteEmployee,
   handleEditEmployee,
-  handleSearchEmployee
+  handleSearchEmployee,
 } from "../controllers/employee.js";
 
 import {
@@ -87,6 +87,8 @@ import {
   handleSearchDiscount,
   handleUpdateDiscount,
 } from "../controllers/discount.js";
+
+import checkPermission from "../middleware/checkPermisson.js";
 const routeAPI = express.Router();
 // Auth
 routeAPI.post("/auth/register", handleRegisterEmployee);
@@ -109,17 +111,19 @@ routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
-routeAPI.get("/product", handleGetAllProducts);
-routeAPI.put("/product", verifyToken, handleDeleteProduct);
+routeAPI.get("/product", verifyToken, checkPermission, handleGetAllProducts);
+routeAPI.put("/product", verifyToken, checkPermission, handleDeleteProduct);
 routeAPI.post(
   "/product/add-product",
   verifyToken,
+  checkPermission,
   upload.array("product", 5),
   products.add_product
 );
 routeAPI.put(
   "/product/update-product",
   verifyToken,
+  checkPermission,
   upload.array("product", 2),
   products.handleUpdateProduct
 );

@@ -65,7 +65,7 @@ const handleSetPermission = async (req, res) => {
     res.status(200).json("Thay đổi thành công");
   } catch (error) {
     console.log(error);
-    res.status(401).error(error.message);
+    res.status(401).json(error);
   }
 };
 
@@ -78,7 +78,7 @@ const handleGetActionById = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).error(error.message);
+    res.status(401).json(error);
   }
 };
 
@@ -97,7 +97,7 @@ const handleGetActionView = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).error(error.message);
+    res.status(401).json(error);
   }
 };
 
@@ -129,7 +129,7 @@ const handleGetPermissions = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).error(error.message);
+    res.status(401).json(error);
   }
 };
 
@@ -143,7 +143,7 @@ const handleGetRole = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).error(error.message);
+    res.status(401).json(error);
   }
 };
 

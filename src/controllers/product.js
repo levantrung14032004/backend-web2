@@ -8,7 +8,7 @@ export const handleGetAllProducts = async (req, res) => {
     let allProducts = await productService.getProduct();
     return res.status(200).json(allProducts);
   } catch (error) {
-    return res.status(500).json(error.message);
+    return res.status(500).json(error);
   }
 };
 
@@ -35,7 +35,7 @@ export const handleDeleteProduct = async (req, res) => {
       res.status(500).json("Sản phẩm chưa được xóa");
     }
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json(error);
   }
 };
 
@@ -115,7 +115,7 @@ export const handleGetProductWithCategory = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).error(error.message);
+    res.status(500).error(error);
   }
 };
 export const get_products_at_home = async (req, res) => {
