@@ -57,16 +57,24 @@ const handleAddAuthor = async (req, res) => {
 
 const handleUpdateAuthor = async (req, res) => {
   try {
-    const { id, name, information } = req.body;
+    const { id, name, information, thumbnailURL } = req.body;
     const thumbnail = req.file;
-    if (!thumbnail) {
+    if (!thumbnail && !thumbnailURL) {
       return res.status(400).json("Thiếu ảnh đại diện");
     }
-    const uploadIMG = await uploadIMG_service(thumbnail);
-    if (uploadIMG.error === 1) {
-      return res.status(400).json("Lưu ảnh thất bại");
+    let uploadIMG = null;
+    if (thumbnail) {
+      uploadIMG = await uploadIMG_service(thumbnail);
+      if (uploadIMG.error === 1) {
+        return res.status(400).json("Lưu ảnh thất bại");
+      }
     }
-    const result = await updateAuthor(id, name, information, uploadIMG.URL);
+    const result = await updateAuthor(
+      id,
+      name,
+      information,
+      uploadIMG === null ? "" : uploadIMG.URL
+    );
     if (result) {
       res.status(200).json("Cap nhat tac gia thanh cong");
     } else {

@@ -50,11 +50,17 @@ const addAuthor = (name, thumbnail, information) =>
     }
   });
 
-const updateAuthor = async (id, name, infomation, thumbnail) => {
+const updateAuthor = async (id, name, information, thumbnail) => {
   try {
+    const sql =
+      thumbnail === ""
+        ? "update author set name = ?, information = ? where id = ?"
+        : "update author set name = ?, thumbnail = ?, information = ? where id = ?";
     const [result, fields] = await connection.execute(
-      "update author set name = ?, thumbnail = ?, information = ? where id = ?",
-      [name, thumbnail, infomation, id]
+      sql,
+      thumbnail === ""
+        ? [name, information, id]
+        : [name, thumbnail, information, id]
     );
     if (result.affectedRows) return true;
     return false;
