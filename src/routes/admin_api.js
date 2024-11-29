@@ -112,7 +112,7 @@ routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
 routeAPI.get("/product", verifyToken, checkPermission, handleGetAllProducts);
-routeAPI.put("/product", verifyToken, handleDeleteProduct);
+routeAPI.put("/product", verifyToken, checkPermission, handleDeleteProduct);
 routeAPI.post(
   "/product/add-product",
   verifyToken,
