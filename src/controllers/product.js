@@ -230,7 +230,7 @@ export const handleSearchProduct = async (req, res) => {
       return res.status(400).json("Missing text");
     }
     const value = String(text).toLowerCase();
-    const result = await productService.getProduct();
+    const result = await productService.getProductForAdmin();
     const result_search = result.filter((product) => {
       let status = null;
       return Object.entries(product).some((entry) => {
@@ -264,3 +264,11 @@ export const handleSearchProduct = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+export const handleGetAllProductsForAdmin = async (req,res) =>{
+  try {
+    let allProducts = await productService.getProductForAdmin();
+    return res.status(200).json(allProducts);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
