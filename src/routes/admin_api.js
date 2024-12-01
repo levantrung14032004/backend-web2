@@ -1,9 +1,9 @@
 import {
-  handleGetAllProducts,
   handleDeleteProduct,
   handleSortLowToHigh,
   handleSortHighToLow,
   handleGetProductWithCategory,
+  handleGetAllProductsForAdmin,
 } from "../controllers/product.js";
 
 import { handleCreateProductTemp } from "../controllers/tempProduct.js";
@@ -112,7 +112,12 @@ routeAPI.get("/current-action", verifyToken, handleGetCurrentAction);
 
 routeAPI.get("/product/filter/category", handleGetProductWithCategory);
 // Product
-routeAPI.get("/product", verifyToken, checkPermission, handleGetAllProducts);
+routeAPI.get(
+  "/product",
+  verifyToken,
+  checkPermission,
+  handleGetAllProductsForAdmin
+);
 routeAPI.put("/product", verifyToken, checkPermission, handleDeleteProduct);
 routeAPI.post(
   "/product/add-product",

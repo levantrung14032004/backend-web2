@@ -5,7 +5,7 @@ import uploadIMG_service from "../services/uploadIMG.js";
 // Products
 export const handleGetAllProducts = async (req, res) => {
   try {
-    let allProducts = await productService.getProductForAdmin();
+    let allProducts = await productService.getProduct();
     return res.status(200).json(allProducts);
   } catch (error) {
     return res.status(500).json(error);
@@ -231,8 +231,9 @@ export const handleSearchProduct = async (req, res) => {
     }
     const value = String(text).toLowerCase();
     const result = await productService.getProductForAdmin();
-    const result_search = result.filter((product) =>
-      Object.entries(product).some((entry) => {
+    const result_search = result.filter((product) => {
+      let status = null;
+      return Object.entries(product).some((entry) => {
         if (
           entry[0] === "author_id" ||
           entry[0] === "thumbnail" ||
@@ -240,19 +241,34 @@ export const handleSearchProduct = async (req, res) => {
           entry[0] === "introduce" ||
           entry[0] === "created_at" ||
           entry[0] === "update_at" ||
-          entry[0] === "quantity"
-        )
+          entry[0] === "status"
+        ) {
+          if (entry[0] === "status") {
+            status = entry[1];
+          }
           return false;
-        if (entry[0] === "status")
-          return (
-            String("Còn hàng").toLowerCase().includes(value) ||
-            String("Hết hàng").toLowerCase().includes(value)
-          );
+        }
+        if (entry[0] === "quantity") {
+          const temp =
+            entry[1] !== null && entry[1] > 0 && status === 1
+              ? "Còn hàng"
+              : "Hết hàng";
+          return temp.toLowerCase().includes(value);
+        }
         return String(entry[1]).toLowerCase().includes(value);
-      })
-    );
+      });
+    });
+
     return res.status(200).json(result_search);
   } catch (error) {
     return res.status(500).json(error);
   }
 };
+export const handleGetAllProductsForAdmin = async (req,res) =>{
+  try {
+    let allProducts = await productService.getProductForAdmin();
+    return res.status(200).json(allProducts);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
