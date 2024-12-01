@@ -24,6 +24,7 @@ import {
   handleCreateReceived,
   handelUpdateCompany,
   handleSearchCompany,
+  handleGetCompanyRunning,
 } from "../controllers/company.js";
 
 import {
@@ -177,6 +178,7 @@ routeAPI.post("/create-received", verifyToken, handleCreateReceived);
 
 // Company
 routeAPI.get("/company", verifyToken, handleGetCompany);
+routeAPI.get("/company-running", verifyToken, handleGetCompanyRunning);
 routeAPI.post("/company", verifyToken, handleInsertCompany);
 routeAPI.put("/company-update", verifyToken, handelUpdateCompany);
 routeAPI.put("/company-delete", verifyToken, handleDeleteCompany);

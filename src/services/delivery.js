@@ -11,6 +11,19 @@ const getCompany = () =>
     }
   });
 
+const getCompanyRunning = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.query(
+        `select * from company_delivery where status = 'running'`
+      );
+      resolve(result);
+    } catch (error) {
+      console.error(error);
+      reject(null);
+    }
+  });
+
 const insertCompany = async (name, discount, description) => {
   const [result, fields] = await connection.execute(
     `insert into company_delivery(name, discount, description) values (?, ?, ? )`,
@@ -113,4 +126,5 @@ export {
   deleteCompany,
   createGoodsReceived,
   updateCompany,
+  getCompanyRunning,
 };

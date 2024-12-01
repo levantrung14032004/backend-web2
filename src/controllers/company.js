@@ -4,6 +4,7 @@ import {
   deleteCompany,
   createGoodsReceived,
   updateCompany,
+  getCompanyRunning,
 } from "../services/delivery.js";
 import moment from "moment";
 
@@ -12,7 +13,16 @@ const handleGetCompany = async (req, res) => {
     const result = await getCompany();
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(500).error(error.message);
+    return res.status(500).json(error.message);
+  }
+};
+
+const handleGetCompanyRunning = async (req, res) => {
+  try {
+    const result = await getCompanyRunning();
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json(error.message);
   }
 };
 const handleInsertCompany = async function (req, res) {
@@ -117,4 +127,5 @@ export {
   handleDeleteCompany,
   handelUpdateCompany,
   handleCreateReceived,
+  handleGetCompanyRunning,
 };
