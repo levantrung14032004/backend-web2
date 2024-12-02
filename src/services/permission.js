@@ -51,10 +51,9 @@ const getRole = async () => {
 const getActionView = async (id) => {
   const [values, field] = await connection.execute(
     `select rp.role_id, p.entity,p.action from role_permissions rp join permissions p 
-    on rp.permission_id = p.id where rp.role_id = ${id} 
-    and 
-    p.action like "view"
-`
+    on rp.permission_id = p.id where rp.role_id = ? 
+    and p.action like 'view' `,
+    [id]
   );
   if (values) {
     return values;
