@@ -121,3 +121,15 @@ export const finishDrpoDiscount = async (id_discount) => {
     return false;
   }
 };
+
+export const deleteDiscount = async (id_discount) => {
+  try {
+    await connection.execute(
+      `update coupon_for_user set status = 0 where id_coupon = ?`,
+      [id_discount]
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};

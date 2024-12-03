@@ -6,6 +6,7 @@ import {
   dropDiscount,
   updateDiscount,
   finishDrpoDiscount,
+  deleteDiscount,
 } from "../services/discount.js";
 
 export const handleGetDiscounts = async (req, res) => {
@@ -128,5 +129,28 @@ export const handleSearchDiscount = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
+export const handleDeleteDiscount = async (req, res) => {
+  try {
+    const { discount_id } = req.body;
+    if (discount_id) {
+      const result = await deleteDiscount(discount_id);
+      if (res) {
+        res.status(200).json({
+          code: 1,
+          message: "Xóa mã giảm giá thành công",
+        });
+      } else {
+        res.status(200).json({
+          code: -1,
+          message: "Thiếu thông tin",
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: 0, message: "Lỗi server" });
   }
 };

@@ -38,6 +38,7 @@ import {
 import {
   handleGetDetailGoodsReceived,
   handleGetGoodsReceived,
+  handleSearchReceived,
 } from "../controllers/received.js";
 
 import {
@@ -70,6 +71,7 @@ import {
   handleGetTotal3D,
   handleGetTotal7D,
   handleGetTotalWithDate,
+  handleSearchOrder,
   handleUpdateOrderStatus,
 } from "../controllers/order.js";
 import {
@@ -80,6 +82,7 @@ import {
 
 import { verifyToken } from "../middleware/jwt_admin.js";
 import {
+  handleDeleteDiscount,
   handleDropDiscount,
   handleGetAllUserWithAmount,
   handleGetDiscounts,
@@ -210,6 +213,7 @@ routeAPI.get(
 );
 routeAPI.post("/discount-max-min", verifyToken, handleGetUserAmountMinMax);
 routeAPI.post("/drop-discount", verifyToken, handleDropDiscount);
+routeAPI.put("/discount/delete", verifyToken, handleDeleteDiscount);
 
 // Search
 routeAPI.get("/discount-search", handleSearchDiscount);
@@ -219,4 +223,6 @@ routeAPI.get("/author-search", handleSearchAuthor);
 routeAPI.get("/product-search", products.handleSearchProduct);
 routeAPI.get("/user-search", handleSearchUser);
 routeAPI.get("/employee-search", handleSearchEmployee);
+routeAPI.get("/received-search", handleSearchReceived);
+routeAPI.get("/order-search", handleSearchOrder);
 export default routeAPI;

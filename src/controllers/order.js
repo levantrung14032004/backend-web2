@@ -268,3 +268,57 @@ export const handleGetTrackingOrder = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const handleSearchOrder = async (req, res) => {
+  try {
+    const allOrder = await orderService.getOrderByAdmin();
+    const result = allOrder.reduce((acc, order) => {
+      const found = acc.find((item) => item.orderId === order.id);
+      if (!found) {
+        acc.push({
+          orderId: order.id,
+          orderDate: order.order_date,
+          status: order.status,
+          total: order.total_money,
+          employeeId: order.employee_id,
+          shipFee: order.shipFee,
+          note: order.note,
+          phone_number: order.phone_number,
+          address: order.address,
+          fullname: order.fullname,
+          products: [
+            {
+              productName: order.title,
+              thumbnail: order.thumbnail,
+              unitPrice: order.price,
+              quantity: order.num,
+            },
+          ],
+        });
+      } else {
+        found.products.push({
+          productName: order.title,
+          thumbnail: order.thumbnail,
+          unitPrice: order.price,
+          quantity: order.num,
+        });
+      }
+      return acc;
+    }, []);
+    const { search } = req.query;
+    const value = String(search).toLowerCase().trim();
+    const resultSearch = result.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};

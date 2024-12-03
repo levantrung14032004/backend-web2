@@ -7,7 +7,11 @@ const handleGetGoodsReceived = async (req, res) => {
   try {
     const response = await getGoodsReceived();
     if (response) {
-      res.status(200).json(response);
+      res.status(200).json({
+        code: 1,
+        message: "Lay phieu nhap thanh cong",
+        result: response,
+      });
     } else {
       res.status(401).json("Co loi khi lay phieu nhap");
     }
@@ -59,4 +63,29 @@ const handleGetDetailGoodsReceived = async (req, res) => {
   }
 };
 
-export { handleGetGoodsReceived, handleGetDetailGoodsReceived };
+const handleSearchReceived = async (req, res) => {
+  try {
+    const allReceived = await getGoodsReceived();
+    const { search } = req.query;
+    const value = String(search).toLowerCase().trim();
+    const resultSearch = allReceived.filter((o) =>
+      Object.entries(o).some((entry) =>
+        String(entry[1]).toLowerCase().includes(value)
+      )
+    );
+    if (resultSearch) {
+      res
+        .status(200)
+        .json({ code: 1, message: "Tìm kiếm thành công", data: resultSearch });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ code: -1, message: "Lỗi server" });
+  }
+};
+
+export {
+  handleGetGoodsReceived,
+  handleGetDetailGoodsReceived,
+  handleSearchReceived,
+};
