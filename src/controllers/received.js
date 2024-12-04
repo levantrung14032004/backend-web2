@@ -65,10 +65,38 @@ const handleGetDetailGoodsReceived = async (req, res) => {
 
 const handleSearchReceived = async (req, res) => {
   try {
-    const allReceived = await getGoodsReceived();
+    const allReceived = await getDetailGoodsReceived();
+    const result = allReceived.reduce((acc, cur) => {
+      const found = acc.find((item) => item.idReceived === cur.idReceived);
+      if (!found) {
+        acc.push({
+          idReceived: cur.idReceived,
+          dateReceived: cur.dateReceived,
+          name_company: cur.name_company,
+          noteReceived: cur.noteReceived,
+          total_value: cur.total_value,
+          details: [
+            {
+              id: cur.id,
+              title: cur.title,
+              quantity: cur.quantity,
+              price: cur.price,
+            },
+          ],
+        });
+      } else {
+        found.details.push({
+          id: cur.id,
+          title: cur.title,
+          quantity: cur.quantity,
+          price: cur.price,
+        });
+      }
+      return acc;
+    }, []);
     const { search } = req.query;
     const value = String(search).toLowerCase().trim();
-    const resultSearch = allReceived.filter((o) =>
+    const resultSearch = result.filter((o) =>
       Object.entries(o).some((entry) =>
         String(entry[1]).toLowerCase().includes(value)
       )

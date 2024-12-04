@@ -3,7 +3,7 @@ import connection from "../database/database.js";
 export const getDiscounts = async () => {
   try {
     const [result] = await connection.execute(`
-              SELECT * FROM coupon;
+              SELECT * FROM coupon where status = 1;
           `);
     return result;
   } catch (error) {
@@ -95,6 +95,13 @@ export const getUserAmountMinMax = async (min, max) => {
 
 export const dropDiscount = async (user_id, id_discount) => {
   try {
+    const [exist] = await connection.execute(
+      `select * from coupon where id = ? and status = 1`,
+      [id_discount]
+    );
+    if (exist.length === 0) {
+      return false;
+    }
     const [result] = await connection.execute(
       `insert into coupon_for_user values(?,?,1)`,
       [user_id, id_discount]
@@ -128,6 +135,9 @@ export const deleteDiscount = async (id_discount) => {
       `update coupon_for_user set status = 0 where id_coupon = ?`,
       [id_discount]
     );
+    await connection.execute(`update coupon set status = 0 where id = ?`, [
+      id_discount,
+    ]);
     return true;
   } catch (error) {
     return false;
