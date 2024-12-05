@@ -105,7 +105,7 @@ export const getOrderByAdminWithStatus = async (status) => {
 export const getTotalWithDate = async (date) => {
   try {
     const [rows, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = ?`,
+      `SELECT SUM(total_money + shipFee) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = ? and status = 10`,
       [date]
     );
     return rows[0];
@@ -137,7 +137,7 @@ LIMIT 6`
 export const getDashDtoD = async (startDate, endDate) => {
   try {
     const [totalValues, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) BETWEEN ? AND ?`,
+      `SELECT SUM(total_money + shipFee) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) BETWEEN ? AND ? and status = 10`,
       [startDate, endDate]
     );
 
@@ -236,7 +236,7 @@ export const updateOrderStatus = (id, employee_id, id_status) =>
 export const getRevenueAndOrderOne = async () => {
   try {
     const [revenue, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = CURDATE()`
+      `SELECT SUM(total_money + shipFee) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = CURDATE() and status = 10`
     );
     const [order, fields2] = await connection.execute(
       `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE DATE(order_date) = CURDATE()`
@@ -255,7 +255,7 @@ export const getRevenueAndOrderOne = async () => {
 export const getRevenueAndOrderThree = async () => {
   try {
     const [revenue, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
+      `SELECT SUM(total_money + shipFee) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY) and status = 10`
     );
     const [order, fields2] = await connection.execute(
       `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
@@ -274,7 +274,7 @@ export const getRevenueAndOrderThree = async () => {
 export const getRevenueAndOrderSeven = async () => {
   try {
     const [revenue, fields] = await connection.execute(
-      `SELECT SUM(total_money) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`
+      `SELECT SUM(total_money + shipFee) AS total_revenue FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) and status = 10`
     );
     const [order, fields2] = await connection.execute(
       `SELECT COUNT(*) AS total_orders FROM ${process.env.DATABASE_NAME}.order WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`
