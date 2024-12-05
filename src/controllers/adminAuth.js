@@ -59,7 +59,7 @@ const handleRegisterEmployee = async (req, res) => {
 const handleLoginEmployee = async (req, res) => {
   try {
     const employee = await findEmployeeByEmail(req.body.email);
-    if (!employee) {
+    if (employee.length === 0) {
       res.status(401).json({ code: 0, message: "Email không tồn tại" });
       return;
     } else {
