@@ -60,7 +60,7 @@ const handleLoginEmployee = async (req, res) => {
   try {
     const employee = await findEmployeeByEmail(req.body.email);
     if (employee.length === 0) {
-      res.status(401).json({ code: 0, message: "Email không tồn tại" });
+      res.status(200).json({ code: 0, message: "Email không tồn tại" });
       return;
     } else {
       const validPassword = await bcrypt.compare(
