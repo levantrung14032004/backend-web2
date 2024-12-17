@@ -59,8 +59,8 @@ const handleRegisterEmployee = async (req, res) => {
 const handleLoginEmployee = async (req, res) => {
   try {
     const employee = await findEmployeeByEmail(req.body.email);
-    if (!employee) {
-      res.status(401).json({ code: 0, message: "Email không tồn tại" });
+    if (employee.length === 0) {
+      res.status(200).json({ code: 0, message: "Email không tồn tại" });
       return;
     } else {
       const validPassword = await bcrypt.compare(
@@ -85,7 +85,11 @@ const handleLoginEmployee = async (req, res) => {
       }
     }
   } catch (error) {
-    res.status(500).json("Loi " + error);
+    console.log(error);
+    res.status(500).json({
+      code: 0,
+      message: "Đăng nhập thất bại",
+    });
   }
 };
 
